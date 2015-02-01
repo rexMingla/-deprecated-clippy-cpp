@@ -18,6 +18,8 @@ public:
     ~ClipboardItem();
 
     const QString value();
+    static QMimeData* copyMimeData(const QMimeData* from);
+    static bool isMimeDataEqual(const QMimeData* left, const QMimeData* right);
 };
 
 #endif // CLIPBOARDITEM_H

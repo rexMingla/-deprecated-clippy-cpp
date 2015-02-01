@@ -4,24 +4,6 @@
 
 #include <QMimeData>
 
-// see http://stackoverflow.com/questions/13762140/proper-way-to-copy-a-qmimedata-object
-static QMimeData* copyMimeData(const QMimeData* mimeReference) {
-    QMimeData* mimeCopy = new QMimeData();
-    foreach(QString format, mimeReference->formats()) {
-        // Retrieving data
-        QByteArray data = mimeReference->data(format);
-        // Checking for custom MIME types
-        if(format.startsWith("application/x-qt")) {
-            // Retrieving true format name
-            int indexBegin = format.indexOf('"') + 1;
-            int indexEnd = format.indexOf('"', indexBegin);
-            format = format.mid(indexBegin, indexEnd - indexBegin);
-        }
-        mimeCopy->setData(format, data);
-    }
-    return mimeCopy;
-}
-
 ClipboardItem::ClipboardItem(const QMimeData* mimeData) : mimeData_(copyMimeData(mimeData)) {
 }
 
@@ -43,4 +25,52 @@ const QString ClipboardItem::value() {
          //setText(tr("Cannot display data"));
      }
     return ret;
+}
+
+// see http://stackoverflow.com/questions/13762140/proper-way-to-copy-a-qmimedata-object
+QMimeData* ClipboardItem::copyMimeData(const QMimeData* from) {
+  QMimeData* mimeCopy = new QMimeData();
+  foreach(QString format, from->formats()) {
+    // Retrieving data
+    QByteArray data = from->data(format);
+    // Checking for custom MIME types
+    if(format.startsWith("application/x-qt")) {
+      // Retrieving true format name
+      int indexBegin = format.indexOf('"') + 1;
+      int indexEnd = format.indexOf('"', indexBegin);
+      format = format.mid(indexBegin, indexEnd - indexBegin);
+    }
+    mimeCopy->setData(format, data);
+  }
+  return mimeCopy;
+}
+
+bool ClipboardItem::isMimeDataEqual(const QMimeData* left, const QMimeData* right) {
+  if (left == NULL && right == NULL) {
+    qxtLog->debug("isMimeDataEqual: both null");
+    return true;
+  }
+  if (left == NULL || right == NULL) {
+    qxtLog->debug("isMimeDataEqual: one of the values was null");
+    return false;
+  }
+  QStringList leftFormats = left->formats();
+  QStringList rightFormats = right->formats();
+  if (leftFormats.size() != rightFormats.size()) {
+    qxtLog->debug("isMimeDataEqual: number of formats do not match. left=",
+        leftFormats.size(), " right=", rightFormats.size());
+    return false;
+  }
+  foreach(QString leftFormat, leftFormats) {
+    if (!right->hasFormat(leftFormat)) {
+      qxtLog->debug("isMimeDataEqual: right does not have format. format=", leftFormat);
+      return false;
+    }
+    if (left->data(leftFormat) != right->data(leftFormat)) {
+      qxtLog->debug("isMimeDataEqual: data mismatch for format. format=", leftFormat,
+          " left=", left->data(leftFormat), "right=", right->data(leftFormat));
+      return false;
+    }
+  }
+  return true;
 }

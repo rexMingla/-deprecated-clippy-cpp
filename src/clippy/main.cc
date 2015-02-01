@@ -1,5 +1,6 @@
 #include "ActionWidget.h"
 #include "ClipboardManager.h"
+#include "ClipboardPoller.h"
 #include "ConfigWidget.h"
 
 #include "vendor/qxt/qxtbasicfileloggerengine.h"
@@ -46,11 +47,17 @@ int main(int argc, char *argv[])
 
   ConfigWidget* configWidget = new ConfigWidget(); // make this the parent widget
   ClipboardManager* clipboardManager = new ClipboardManager(configWidget);
+#ifdef Q_WS_MAC
+  // only mac requires polling to get global keyboard changes. link in ClipboardPoller
+  ClipboardPoller* clipboardPoller = new ClipboardPoller(ClipboardPoller::DEFAULT_POLL_INTERVAL_MILLIS, configWidget);
+  QObject::connect(clipboardPoller, SIGNAL(clipboardChangedSignal()), clipboardManager, SLOT(onClipboardChanged()));
+#endif // Q_WS_MAC
+
   ActionWidget* actionWidget = new ActionWidget(clipboardManager, configWidget);
   QSystemTrayIcon* systemTray = new QSystemTrayIcon(configWidget);
   systemTray->setContextMenu(actionWidget->getMenu());
   QObject::connect(actionWidget, SIGNAL(showSettingsSignal()), configWidget, SLOT(show()));
-  systemTray->setIcon(configWidget->style()->standardIcon(QStyle::SP_MessageBoxInformation));
+  systemTray->setIcon(configWidget->style()->standardIcon(QStyle::SP_MessageBoxInformation)); // TODO
   systemTray->show();
 
   try {
