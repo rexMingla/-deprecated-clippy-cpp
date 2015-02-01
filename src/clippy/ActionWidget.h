@@ -6,6 +6,7 @@
 class ClipboardManager;
 class QAction;
 class QMenu;
+class ClipboardItem;
 
 class ActionWidget : public QWidget
 {
@@ -14,6 +15,7 @@ private:
   ClipboardManager* clipboardManager_;
   QMenu* menu_;
   QAction* quitAction_;
+  QAction* clearHistoryAction_;
   QAction* showSettingsAction_;
 
 public:
@@ -24,10 +26,11 @@ public:
 
 private slots:
   void rebuildMenu();
+  void onActionTriggered(QAction* action);
 
 signals:
   void showSettingsSignal();
-  //void performActionSignal(const Clipboar);
+  void performActionSignal(const ClipboardItem&);
   //void actionSelected(QObject object);
 };
 

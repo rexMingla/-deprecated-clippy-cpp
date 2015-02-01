@@ -40,21 +40,26 @@ int main(int argc, char *argv[])
   setupLogs();
   qxtLog->info("App started");
 
+  //qRegisterMetaType<ClipboardItem::Ptr>("ClipboardItem::Ptr");
+
   //QObject::connect(actionWidget, setImage(const QImage&);
   //QObject::connect(actionWidget, setMimeData(QMimeData* src);
   //QObject::connect(actionWidget, setPixmap(const QPixmap& pixmap);
   //QObject::connect(actionWidget, setText(c
 
-  ConfigWidget* configWidget = new ConfigWidget(); // make this the parent widget
-  ClipboardManager* clipboardManager = new ClipboardManager(configWidget);
+  ConfigWidget* configWidget = new ConfigWidget();
+  QWidget* parent = configWidget;
+  ClipboardManager* clipboardManager = new ClipboardManager(parent);
 #ifdef Q_WS_MAC
   // only mac requires polling to get global keyboard changes. link in ClipboardPoller
-  ClipboardPoller* clipboardPoller = new ClipboardPoller(ClipboardPoller::DEFAULT_POLL_INTERVAL_MILLIS, configWidget);
+  ClipboardPoller* clipboardPoller = new ClipboardPoller(ClipboardPoller::DEFAULT_POLL_INTERVAL_MILLIS, parent);
   QObject::connect(clipboardPoller, SIGNAL(clipboardChangedSignal()), clipboardManager, SLOT(onClipboardChanged()));
 #endif // Q_WS_MAC
 
-  ActionWidget* actionWidget = new ActionWidget(clipboardManager, configWidget);
-  QSystemTrayIcon* systemTray = new QSystemTrayIcon(configWidget);
+  //ActionExecutor* actionExecutor = new ActionExecutor(parent);
+  ActionWidget* actionWidget = new ActionWidget(clipboardManager, parent);
+  QObject::connect(actionWidget, SIGNAL(showSettingsSignal()), configWidget, SLOT(show()));
+  QSystemTrayIcon* systemTray = new QSystemTrayIcon(parent);
   systemTray->setContextMenu(actionWidget->getMenu());
   QObject::connect(actionWidget, SIGNAL(showSettingsSignal()), configWidget, SLOT(show()));
   systemTray->setIcon(configWidget->style()->standardIcon(QStyle::SP_MessageBoxInformation)); // TODO

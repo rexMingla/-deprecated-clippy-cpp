@@ -36,42 +36,40 @@ void ClipboardManager::cleanupItems() {
     }
 }
 
-void ClipboardManager::setImage(const QImage&) {
+void ClipboardManager::clearItems() {
+  items_.clear();
 }
 
-void ClipboardManager::setMimeData(QMimeData*) {
-
-}
-
-void ClipboardManager::setPixmap(const QPixmap&) {
-
+void ClipboardManager::setMimeData(ClipboardItem::Ptr data) {
+  qxtLog->debug("setMimeData");
+  clipboard_->setMimeData(data->mimeData());
 }
 
 void ClipboardManager::setText(const QString& text) {
-    clipboard_->setText(text, QClipboard::Clipboard);
+  clipboard_->setText(text, QClipboard::Clipboard);
 }
 
 void ClipboardManager::onClipboardChanged() {
-    qxtLog->debug("clipboard updated");
+  qxtLog->debug("clipboard updated");
 
-    // example usage from http://qt-project.org/doc/qt-4.8/qclipboard.html
-    const QMimeData* mimeData = clipboard_->mimeData();
+  // example usage from http://qt-project.org/doc/qt-4.8/qclipboard.html
+  const QMimeData* mimeData = clipboard_->mimeData();
 
 
-    /*if (mimeData->hasImage()) {
-        setPixmap(qvariant_cast<QPixmap>(mimeData->imageData()));
-    } else if (mimeData->hasHtml()) {
-        setText(mimeData->html());
-        setTextFormat(Qt::RichText);
-    } else if (mimeData->hasText()) {
-        setText(mimeData->text());
-        setTextFormat(Qt::PlainText);
-    } else {
-        qxtLog->warning("Cannot display clipboard data");
-    }*/
-    items_.push_front(ClipboardItem::Ptr(new ClipboardItem(mimeData)));
+  /*if (mimeData->hasImage()) {
+      setPixmap(qvariant_cast<QPixmap>(mimeData->imageData()));
+  } else if (mimeData->hasHtml()) {
+      setText(mimeData->html());
+      setTextFormat(Qt::RichText);
+  } else if (mimeData->hasText()) {
+      setText(mimeData->text());
+      setTextFormat(Qt::PlainText);
+  } else {
+      qxtLog->warning("Cannot display clipboard data");
+  }*/
+  items_.push_front(ClipboardItem::Ptr(new ClipboardItem(mimeData)));
 }
 
-const QList<ClipboardItem::Ptr>& ClipboardManager::getItems() {
+const QList<ClipboardItem::Ptr>& ClipboardManager::items() {
     return items_;
 }

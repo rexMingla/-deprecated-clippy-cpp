@@ -3,28 +3,36 @@
 #include "vendor/qxt/qxtlogger.h"
 
 #include <QMimeData>
+#include <QTextDocument>
 
 ClipboardItem::ClipboardItem(const QMimeData* mimeData) : mimeData_(copyMimeData(mimeData)) {
 }
 
 ClipboardItem::~ClipboardItem() {
-    delete mimeData_;
+  delete mimeData_;
 }
 
-const QString ClipboardItem::value() {
-    QString ret;
-    if (mimeData_->hasImage()) {
-         //setPixmap(qvariant_cast<QPixmap>(mimeData->imageData()));
-     } else if (mimeData_->hasHtml()) {
-         ret = mimeData_->html();
-         //setTextFormat(Qt::RichText);
-     } else if (mimeData_->hasText()) {
-         ret = mimeData_->text();
-         //setTextFormat(Qt::PlainText);
-     } else {
-         //setText(tr("Cannot display data"));
-     }
-    return ret;
+QMimeData* ClipboardItem::mimeData() {
+  return mimeData_;
+}
+
+const QString ClipboardItem::displayText() {
+  QString ret;
+  if (mimeData_->hasImage()) {
+    return "<image>";
+     //setPixmap(qvariant_cast<QPixmap>(mimeData->imageData()));
+   } else if (mimeData_->hasHtml()) {
+     QTextDocument doc;
+     doc.setHtml(mimeData_->html());
+     ret = doc.toPlainText();
+     //setTextFormat(Qt::RichText);
+   } else if (mimeData_->hasText()) {
+     ret = mimeData_->text();
+     //setTextFormat(Qt::PlainText);
+   } else {
+     //setText(tr("Cannot display data"));
+   }
+  return ret;
 }
 
 // see http://stackoverflow.com/questions/13762140/proper-way-to-copy-a-qmimedata-object
