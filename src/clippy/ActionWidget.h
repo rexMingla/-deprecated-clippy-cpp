@@ -3,19 +3,32 @@
 
 #include <QWidget>
 
-class QObject;
+class ClipboardManager;
+class QAction;
+class QMenu;
 
 class ActionWidget : public QWidget
 {
-    Q_OBJECT
+  Q_OBJECT
+private:
+  ClipboardManager* clipboardManager_;
+  QMenu* menu_;
+  QAction* quitAction_;
+  QAction* showSettingsAction_;
+
 public:
-    explicit ActionWidget(QWidget *parent = 0);
-    ~ActionWidget();
+  explicit ActionWidget(ClipboardManager* clipboardManager, QWidget* parent = 0);
+  ~ActionWidget();
+
+  QMenu* getMenu();
+
+private slots:
+  void rebuildMenu();
 
 signals:
-    //void actionSelected(QObject object);
-
-public slots:
+  void showSettingsSignal();
+  //void performActionSignal(const Clipboar);
+  //void actionSelected(QObject object);
 };
 
 #endif // ACTIONWIDGET_H
