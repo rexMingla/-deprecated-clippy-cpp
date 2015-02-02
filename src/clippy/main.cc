@@ -9,6 +9,7 @@
 #include "vendor/qxt/qxtlogger.h"
 
 #include <QApplication>
+#include <QIcon>
 #include <QMessageBox>
 #include <QStyle>
 #include <QSystemTrayIcon>
@@ -57,7 +58,10 @@ int main(int argc, char *argv[])
   QSystemTrayIcon* systemTray = new QSystemTrayIcon(parent);
   systemTray->setContextMenu(actionWidget->getMenu());
   QObject::connect(actionWidget, SIGNAL(showSettingsSignal()), configWidget, SLOT(show()));
-  systemTray->setIcon(configWidget->style()->standardIcon(QStyle::SP_MessageBoxInformation)); // TODO
+
+  // thanks to http://www.flaticon.com/free-icon/verification-of-delivery-list-clipboard-symbol_45802
+  QIcon icon(":/resources/icon.png");
+  systemTray->setIcon(icon);
   systemTray->show();
 
   try {
