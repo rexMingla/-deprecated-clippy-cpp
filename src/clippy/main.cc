@@ -2,6 +2,7 @@
 #include "ClipboardManager.h"
 #include "ClipboardPoller.h"
 #include "ConfigWidget.h"
+#include "Settings.h"
 
 #include "vendor/qxt/qxtbasicfileloggerengine.h"
 #include "vendor/qxt/qxtbasicstdloggerengine.h"
@@ -40,19 +41,13 @@ int main(int argc, char *argv[])
   setupLogs();
   qxtLog->info("App started");
 
-  //qRegisterMetaType<ClipboardItem::Ptr>("ClipboardItem::Ptr");
-
-  //QObject::connect(actionWidget, setImage(const QImage&);
-  //QObject::connect(actionWidget, setMimeData(QMimeData* src);
-  //QObject::connect(actionWidget, setPixmap(const QPixmap& pixmap);
-  //QObject::connect(actionWidget, setText(c
-
-  ConfigWidget* configWidget = new ConfigWidget();
+  Settings* settings = new Settings(QApplication::applicationDirPath() + "/clippy.ini");
+  ConfigWidget* configWidget = new ConfigWidget(settings);
   QWidget* parent = configWidget;
-  ClipboardManager* clipboardManager = new ClipboardManager(parent);
+  ClipboardManager* clipboardManager = new ClipboardManager(settings, parent);
 #ifdef Q_WS_MAC
   // only mac requires polling to get global keyboard changes. link in ClipboardPoller
-  ClipboardPoller* clipboardPoller = new ClipboardPoller(ClipboardPoller::DEFAULT_POLL_INTERVAL_MILLIS, parent);
+  ClipboardPoller* clipboardPoller = new ClipboardPoller(settings, parent);
   QObject::connect(clipboardPoller, SIGNAL(clipboardChangedSignal()), clipboardManager, SLOT(onClipboardChanged()));
 #endif // Q_WS_MAC
 

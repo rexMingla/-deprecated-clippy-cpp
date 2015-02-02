@@ -11,24 +11,21 @@ class QImage;
 class QMimeData;
 class QPixmap;
 class QString;
+class Settings;
 
 class ClipboardManager : public QObject
 {
   Q_OBJECT
-public:
-  static const int MIN_ITEMS = 1;
-  static const int MAX_ITEMS = 1000;
-
 private:
+  Settings* settings_;
   QList<ClipboardItem::Ptr> items_;
   QClipboard* clipboard_;
   int maxSize_;
 
 public:
-  explicit ClipboardManager(QObject* parent = 0);
+  explicit ClipboardManager(Settings* settings, QObject* parent = 0);
   ~ClipboardManager();
 
-  void setMaxItems(int maxSize);
   const QList<ClipboardItem::Ptr>& items();
 
 private:
@@ -41,6 +38,7 @@ public slots:
 
 private slots:
   void onClipboardChanged();
+  void onSettingsChanged();
 };
 
 #endif // CLIPBOARDMANAGER_H

@@ -1,5 +1,8 @@
 #include "ClipboardManager.h"
 
+#include "SettingItem.h"
+#include "Settings.h"
+
 #include "vendor/qxt/qxtlogger.h"
 
 #include <QApplication>
@@ -8,32 +11,24 @@
 #include <QPixmap>
 #include <QString>
 #include <QClipboard>
-#include <QStack>
 
-ClipboardManager::ClipboardManager(QObject* parent) :
-    QObject(parent), clipboard_(QApplication::clipboard()), maxSize_(MAX_ITEMS)
+ClipboardManager::ClipboardManager(Settings* settings, QObject* parent)
+  : QObject(parent), settings_(settings),
+    clipboard_(QApplication::clipboard()), maxSize_(0)
 {
-    connect(clipboard_, SIGNAL(dataChanged()), this, SLOT(onClipboardChanged()));
+  connect(settings_, SIGNAL(settingsChangedSignal()), SLOT(onSettingsChanged()));
+  connect(clipboard_, SIGNAL(dataChanged()), this, SLOT(onClipboardChanged()));
+  onSettingsChanged();
 }
 
-ClipboardManager::~ClipboardManager()
-{
-
-}
-
-void ClipboardManager::setMaxItems(int maxSize) {
-    if (MIN_ITEMS < maxSize || maxSize > MAX_ITEMS) {
-        qxtLog->warning("Value ignore as not within bounds. value=", maxSize,
-                ". acceptable range between ", MIN_ITEMS, " and ", MAX_ITEMS);
-    }
-    maxSize_ = maxSize;
+ClipboardManager::~ClipboardManager() {
 }
 
 void ClipboardManager::cleanupItems() {
-    if (items_.size() > maxSize_) {
-         // could be more efficient here as it's likely only one item
-        items_ = items_.mid(0, maxSize_);
-    }
+  if (items_.size() > maxSize_) {
+     // could be more efficient here as it's likely only one item
+    items_ = items_.mid(0, maxSize_);
+  }
 }
 
 void ClipboardManager::clearItems() {
@@ -46,7 +41,7 @@ void ClipboardManager::setMimeData(ClipboardItem::Ptr data) {
 }
 
 void ClipboardManager::setText(const QString& text) {
-  clipboard_->setText(text, QClipboard::Clipboard);
+  clipboard_->setText(text);
 }
 
 void ClipboardManager::onClipboardChanged() {
@@ -54,22 +49,17 @@ void ClipboardManager::onClipboardChanged() {
 
   // example usage from http://qt-project.org/doc/qt-4.8/qclipboard.html
   const QMimeData* mimeData = clipboard_->mimeData();
-
-
-  /*if (mimeData->hasImage()) {
-      setPixmap(qvariant_cast<QPixmap>(mimeData->imageData()));
-  } else if (mimeData->hasHtml()) {
-      setText(mimeData->html());
-      setTextFormat(Qt::RichText);
-  } else if (mimeData->hasText()) {
-      setText(mimeData->text());
-      setTextFormat(Qt::PlainText);
-  } else {
-      qxtLog->warning("Cannot display clipboard data");
-  }*/
   items_.push_front(ClipboardItem::Ptr(new ClipboardItem(mimeData)));
 }
 
+void ClipboardManager::onSettingsChanged() {
+  int newMaxSize = settings_->maxNumItems().value().toInt();
+  if (maxSize_ != newMaxSize) {
+    maxSize_ = newMaxSize;
+    cleanupItems();
+  }
+}
+
 const QList<ClipboardItem::Ptr>& ClipboardManager::items() {
-    return items_;
+  return items_;
 }
