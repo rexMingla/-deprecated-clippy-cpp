@@ -3,15 +3,17 @@
 
 #include <QWidget>
 
+class ClipboardItem;
 class ClipboardManager;
 class QAction;
 class QMenu;
-class ClipboardItem;
+class Settings;
 
 class ActionWidget : public QWidget
 {
   Q_OBJECT
 private:
+  Settings* settings_;
   ClipboardManager* clipboardManager_;
   QMenu* menu_;
   QAction* quitAction_;
@@ -19,7 +21,7 @@ private:
   QAction* showSettingsAction_;
 
 public:
-  explicit ActionWidget(ClipboardManager* clipboardManager, QWidget* parent = 0);
+  explicit ActionWidget(Settings* settings, ClipboardManager* clipboardManager, QWidget* parent = 0);
   ~ActionWidget();
 
   QMenu* getMenu();

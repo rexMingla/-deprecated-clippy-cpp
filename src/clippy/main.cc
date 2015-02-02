@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 #endif // Q_WS_MAC
 
   //ActionExecutor* actionExecutor = new ActionExecutor(parent);
-  ActionWidget* actionWidget = new ActionWidget(clipboardManager, parent);
+  ActionWidget* actionWidget = new ActionWidget(settings, clipboardManager, parent);
   QObject::connect(actionWidget, SIGNAL(showSettingsSignal()), configWidget, SLOT(show()));
   QSystemTrayIcon* systemTray = new QSystemTrayIcon(parent);
   systemTray->setContextMenu(actionWidget->getMenu());

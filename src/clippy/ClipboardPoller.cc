@@ -32,13 +32,14 @@ ClipboardPoller::~ClipboardPoller() {
 void ClipboardPoller::onTimeout() {
   const QMimeData* newContent = clipboard_->mimeData();
   if (newContent != NULL && !ClipboardItem::isMimeDataEqual(lastClipboardContent_, newContent)) {
+    if (!isFirstTime_) {
+      isFirstTime_ = false;
+      return;
+    }
     delete lastClipboardContent_;
     lastClipboardContent_ = ClipboardItem::copyMimeData(newContent);
-    if (!isFirstTime_ && newContent != NULL) {
-      qxtLog->debug("new content");
-      emit clipboardChangedSignal();
-      isFirstTime_ = false;
-    }
+    qxtLog->debug("new content");
+    emit clipboardChangedSignal();
   }
 }
 

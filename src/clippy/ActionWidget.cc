@@ -1,6 +1,8 @@
 #include "ActionWidget.h"
 
 #include "ClipboardManager.h"
+#include "SettingItem.h"
+#include "Settings.h"
 #include "vendor/qxt/qxtlogger.h"
 
 #include <QAction>
@@ -9,15 +11,26 @@
 
 namespace {
   static const int MENU_MAX_WIDTH = 200;
+
+  QAction* clipboardItemToAction(int index, const ClipboardItem::Ptr item, QMenu* parent) {
+    QString content = item->displayText();
+    QString formattedName = QString("%1. %2").arg(index).arg(content);
+    QString elidedContent = parent->fontMetrics().elidedText(formattedName, Qt::ElideRight, MENU_MAX_WIDTH);
+    QAction* action = new QAction(elidedContent, parent);
+    action->setToolTip(content);
+    action->setData(QVariant::fromValue(item));
+    return action;
+  }
 }
 
-ActionWidget::ActionWidget(ClipboardManager* clipboardManager, QWidget* parent)
+ActionWidget::ActionWidget(Settings* settings, ClipboardManager* clipboardManager, QWidget* parent)
   : QWidget(parent),
+    settings_(settings),
     clipboardManager_(clipboardManager),
     menu_(new QMenu(this)),
     quitAction_(new QAction("&Quit clippy", this)),
     clearHistoryAction_(new QAction("Clear History", this)),
-    showSettingsAction_(new QAction("Show Settings", this)) {
+    showSettingsAction_(new QAction("Show Settings...", this)) {
 
   connect(showSettingsAction_, SIGNAL(triggered()), SIGNAL(showSettingsSignal()));
   connect(menu_, SIGNAL(aboutToShow()), SLOT(rebuildMenu()));
@@ -39,23 +52,39 @@ QMenu* ActionWidget::getMenu() {
 void ActionWidget::rebuildMenu() {
   qxtLog->debug("rebuilding menu..");
   menu_->clear();
-  menu_->addAction(showSettingsAction_);
-  menu_->addAction(clearHistoryAction_);
 
   // add clipboard contents (use an action group so that we can bind to the data content that
   // we need to pass on to the ClipboardManager
-  QMenu* historyMenu = new QMenu(menu_);
-  foreach (ClipboardItem::Ptr item, clipboardManager_->items()) {
-    QString content = item->displayText();
-    QString elidedContent = fontMetrics().elidedText(content, Qt::ElideRight, MENU_MAX_WIDTH);
-    QAction* action = new QAction(elidedContent, menu_);
-    action->setToolTip(content);
-    action->setData(QVariant::fromValue(item));
-    historyMenu->addAction(action);
+  const QList<ClipboardItem::Ptr>& items = clipboardManager_->items();
+  QList<ClipboardItem::Ptr>::ConstIterator it = items.begin();
+  QList<ClipboardItem::Ptr>::ConstIterator end = items.end();
+  if (items.size() > 0) {
+    QAction* historyAction = new QAction("History", menu_);
+    menu_->addAction(historyAction);
+    menu_->setToolTip("");
+    historyAction->setEnabled(false);
   }
-  menu_->addMenu(historyMenu);
+
+  int numFreeItems = settings_->numFreeItems().value().toInt();
+  int i = 0;
+  for (; i < std::min(items.size(), numFreeItems); ++i, ++it) {
+    menu_->addAction(clipboardItemToAction(i + 1, *it, menu_));
+  }
+  int numItemsPerGroup = settings_->numItemsPerGroup().value().toInt();
+  QMenu* subGroupMenu = NULL;
+  for (; it != end; ++i, ++it) {
+    if (((i - numFreeItems) % numItemsPerGroup) == 0) {
+      subGroupMenu = new QMenu(QString("%1 - %2").arg(i + 1).arg(i + numItemsPerGroup));
+      menu_->addMenu(subGroupMenu);
+    }
+    subGroupMenu->addAction(clipboardItemToAction(i + 1, *it, menu_));
+  }
+  menu_->addSeparator();
+
   connect(menu_, SIGNAL(triggered(QAction*)), SLOT(onActionTriggered(QAction*)));
 
+  menu_->addAction(showSettingsAction_);
+  menu_->addAction(clearHistoryAction_);
   menu_->addSeparator();
   menu_->addAction(quitAction_);
 }
@@ -69,4 +98,3 @@ void ActionWidget::onActionTriggered(QAction* action) {
   ClipboardItem::Ptr item = data.value<ClipboardItem::Ptr>();
   clipboardManager_->setMimeData(item);
 }
-
