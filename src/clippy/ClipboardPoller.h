@@ -20,7 +20,6 @@ private:
   QTimer* timer_;
   const QMimeData* lastClipboardContent_;
   QClipboard* clipboard_;
-  bool isFirstTime_;
 
 public:
   explicit ClipboardPoller(Settings* settings, QObject *parent = 0);

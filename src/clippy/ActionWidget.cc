@@ -75,6 +75,8 @@ void ActionWidget::rebuildMenu() {
   for (; it != end; ++i, ++it) {
     if (((i - numFreeItems) % numItemsPerGroup) == 0) {
       subGroupMenu = new QMenu(QString("%1 - %2").arg(i + 1).arg(i + numItemsPerGroup));
+      subGroupMenu->setToolTip("");
+      connect(subGroupMenu, SIGNAL(triggered(QAction*)), SLOT(onActionTriggered(QAction*)));
       menu_->addMenu(subGroupMenu);
     }
     subGroupMenu->addAction(clipboardItemToAction(i + 1, *it, menu_));

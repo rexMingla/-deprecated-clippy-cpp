@@ -12,12 +12,11 @@
 #include <QTimer>
 #include <QVariant>
 
-ClipboardPoller::ClipboardPoller(Settings* settings, QObject *parent)
+ClipboardPoller::ClipboardPoller(Settings* settings, QObject* parent)
   : QObject(parent),
     timer_(new QTimer(this)),
     lastClipboardContent_(NULL),
-    clipboard_(QApplication::clipboard()),
-    isFirstTime_(true) {
+    clipboard_(QApplication::clipboard()) {
   connect(timer_, SIGNAL(timeout()), this, SLOT(onTimeout()));
   connect(&settings->clipboardRefreshTimeoutMillis(), SIGNAL(settingsChangedSignal(const QVariant&)),
       SLOT(onTimeoutSettingsChanged(const QVariant&)));
@@ -32,14 +31,15 @@ ClipboardPoller::~ClipboardPoller() {
 void ClipboardPoller::onTimeout() {
   const QMimeData* newContent = clipboard_->mimeData();
   if (newContent != NULL && !ClipboardItem::isMimeDataEqual(lastClipboardContent_, newContent)) {
-    if (!isFirstTime_) {
-      isFirstTime_ = false;
-      return;
+    bool isFirstTime = lastClipboardContent_ == NULL;
+    if (!isFirstTime) {
+      delete lastClipboardContent_;
     }
-    delete lastClipboardContent_;
     lastClipboardContent_ = ClipboardItem::copyMimeData(newContent);
-    qxtLog->debug("new content");
-    emit clipboardChangedSignal();
+    if (!isFirstTime) {
+      qxtLog->debug("new content");
+      emit clipboardChangedSignal();
+    }
   }
 }
 

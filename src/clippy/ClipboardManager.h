@@ -21,6 +21,7 @@ private:
   QList<ClipboardItem::Ptr> items_;
   QClipboard* clipboard_;
   int maxSize_;
+  bool ignoreNextValue_;
 
 public:
   explicit ClipboardManager(Settings* settings, QObject* parent = 0);
@@ -38,7 +39,7 @@ public slots:
 
 private slots:
   void onClipboardChanged();
-  void onSettingsChanged();
+  void onMaxNumItemsChanged(const QVariant& value);
 };
 
 #endif // CLIPBOARDMANAGER_H
