@@ -31,8 +31,10 @@ public:
 
 private:
   void cleanupItems();
+  void loadConfig();
 
 public slots:
+  void saveConfig();
   void clearItems();
   void setMimeData(ClipboardItem::Ptr data);
   void setText(const QString& text);

@@ -18,9 +18,9 @@ ClipboardPoller::ClipboardPoller(Settings* settings, QObject* parent)
     lastClipboardContent_(NULL),
     clipboard_(QApplication::clipboard()) {
   connect(timer_, SIGNAL(timeout()), this, SLOT(onTimeout()));
-  connect(&settings->clipboardRefreshTimeoutMillis(), SIGNAL(settingsChangedSignal(const QVariant&)),
+  connect(settings->clipboardRefreshTimeoutMillis(), SIGNAL(settingsChangedSignal(const QVariant&)),
       SLOT(onTimeoutSettingsChanged(const QVariant&)));
-  onTimeoutSettingsChanged(settings->clipboardRefreshTimeoutMillis().value().toInt());
+  onTimeoutSettingsChanged(settings->clipboardRefreshTimeoutMillis()->value().toInt());
   timer_->start();
 }
 

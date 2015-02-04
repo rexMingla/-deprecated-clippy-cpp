@@ -3,7 +3,6 @@
 
 #include <QList>
 #include <QObject>
-#include <QSharedPointer>
 
 class SettingItem;
 class QSettings;
@@ -13,26 +12,29 @@ class Settings : public QObject
 {
   Q_OBJECT
 private:
-  typedef QSharedPointer<SettingItem> SettingItemPtr;
   QSettings* settings_;
-  SettingItemPtr numFreeItems_;
-  SettingItemPtr numItemsPerGroup_;
-  SettingItemPtr maxNumItems_;
-  SettingItemPtr clipboardRefreshTimeoutMillis_;
-  QList<SettingItemPtr> settingList_;
+  SettingItem* numFreeItems_;
+  SettingItem* numItemsPerGroup_;
+  SettingItem* maxNumItems_;
+  SettingItem* clipboardRefreshTimeoutMillis_;
+  SettingItem* persistBetweenSessions_;
+  SettingItem* history_;
+  QList<SettingItem*> settingList_;
 
 public:
   explicit Settings(const QString& filename, QObject* parent = 0);
   ~Settings();
 
-  SettingItem& numFreeItems();
-  SettingItem& numItemsPerGroup();
-  SettingItem& maxNumItems();
-  SettingItem& clipboardRefreshTimeoutMillis();
-  QList<SettingItemPtr>& settings();
+  SettingItem* numFreeItems();
+  SettingItem* numItemsPerGroup();
+  SettingItem* maxNumItems();
+  SettingItem* clipboardRefreshTimeoutMillis();
+  SettingItem* persistBetweenSessions();
+  SettingItem* history();
+  QList<SettingItem*>& settings();
 
 private:
-  void addItems(SettingItemPtr item);
+  void addItem(SettingItem* item);
 
 signals:
   void settingsChangedSignal();

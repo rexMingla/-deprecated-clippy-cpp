@@ -3,10 +3,10 @@
 
 #include <QObject>
 #include <QString>
+#include <QVariant>
 
 class QSettings;
 class SettingValidator;
-class QVariant;
 
 class SettingItem : public QObject
 {
@@ -16,13 +16,15 @@ public:
     INT,
     BOOL,
     STRING,
-    FLOAT
+    FLOAT,
+    LIST
   };
 
   QSettings* settings_;
   const QString key_;
   SettingType type_;
   const SettingValidator* validator_;
+  QVariant defaultValue_;
 
 public:
   SettingItem(QSettings* settings, const QString& key, const QVariant& defaultValue,
@@ -32,6 +34,7 @@ public:
   SettingType type() const;
   QVariant value() const;
   void setValue(const QVariant& value);
+  void setToDefaultValue();
   const SettingValidator& validator() const;
 
 signals:

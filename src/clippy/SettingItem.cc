@@ -11,7 +11,8 @@ SettingItem::SettingItem(QSettings* settings, const QString& key, const QVariant
     settings_(settings),
     key_(key),
     type_(type),
-    validator_(validator) {
+    validator_(validator),
+    defaultValue_(defaultValue) {
   setValue(defaultValue);
 }
 
@@ -35,6 +36,10 @@ void SettingItem::setValue(const QVariant& value) {
   } else {
     qxtLog->warning("Setting value ignored as it's invalid. key=", key_, " ignored value=", value);
   }
+}
+
+void SettingItem::setToDefaultValue() {
+  setValue(defaultValue_);
 }
 
 const SettingValidator& SettingItem::validator() const {

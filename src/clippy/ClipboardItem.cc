@@ -12,11 +12,11 @@ ClipboardItem::~ClipboardItem() {
   delete mimeData_;
 }
 
-QMimeData* ClipboardItem::mimeData() {
+QMimeData* ClipboardItem::mimeData() const {
   return mimeData_;
 }
 
-const QString ClipboardItem::displayText() {
+const QString ClipboardItem::displayText() const {
   QString ret;
   if (mimeData_->hasImage()) {
     return "<image>";
@@ -81,4 +81,23 @@ bool ClipboardItem::isMimeDataEqual(const QMimeData* left, const QMimeData* righ
     }
   }
   return true;
+}
+
+QDataStream& operator <<(QDataStream& istream, const ClipboardItem& item) {
+  const QMimeData* data = item.mimeData();
+  foreach (const QString& format, data->formats()) {
+    istream << qMakePair(format, data->data(format));
+  }
+  return istream;
+}
+
+QDataStream& operator >>(QDataStream& ostream, ClipboardItem& item) {
+  QMimeData mimeData;
+  while (!ostream.atEnd()) {
+    QString format;
+    QByteArray data;
+    ostream >> format >> data;
+    mimeData.setData(format, data);
+  }
+  item = ClipboardItem(&mimeData);
 }

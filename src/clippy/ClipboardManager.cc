@@ -6,29 +6,71 @@
 #include "vendor/qxt/qxtlogger.h"
 
 #include <QApplication>
+#include <QClipboard>
+#include <QDataStream>
 #include <QImage>
 #include <QMimeData>
 #include <QPixmap>
 #include <QString>
-#include <QClipboard>
+#include <QTimer>
 
 ClipboardManager::ClipboardManager(Settings* settings, QObject* parent)
-  : QObject(parent), settings_(settings),
-    clipboard_(QApplication::clipboard()), maxSize_(0), ignoreNextValue_(true) // ignore next due to start up emission
+  : QObject(parent),
+    settings_(settings),
+    clipboard_(QApplication::clipboard()),
+    maxSize_(0),
+    ignoreNextValue_(true) // ignore next due to start up emission
 {
-  connect(&settings_->maxNumItems(), SIGNAL(settingsChangedSignal(const QVariant&)),
+  connect(settings_->maxNumItems(), SIGNAL(settingsChangedSignal(const QVariant&)),
       SLOT(onMaxNumItemsChanged(const QVariant&)));
   connect(clipboard_, SIGNAL(dataChanged()), this, SLOT(onClipboardChanged()));
-  onMaxNumItemsChanged(settings_->maxNumItems().value().toInt());
+  onMaxNumItemsChanged(settings_->maxNumItems()->value().toInt());
+  loadConfig();
 }
 
 ClipboardManager::~ClipboardManager() {
+  saveConfig();
 }
 
 void ClipboardManager::cleanupItems() {
   if (items_.size() > maxSize_) {
      // could be more efficient here as it's likely only one item
     items_ = items_.mid(0, maxSize_);
+  }
+}
+
+void ClipboardManager::saveConfig() {
+  qxtLog->debug("saveConfig");
+  if (settings_->persistBetweenSessions()->value().toBool()) {
+    QList<QVariant> list;
+    foreach (ClipboardItem::Ptr item, items_) {
+      try {
+        QDataStream s;
+        s << *item.data();
+        list << s;
+      } catch (std::exception& ex) {
+        qxtLog->warning("unable to serialize item. ex=", ex.what());
+      }
+      settings_->history()->setValue(list);
+    }
+  }
+}
+
+void ClipboardManager::loadConfig() {
+  qxtLog->debug("loadConfig");
+  items_.clear();
+  foreach (QVariant historyItem, settings_->history()->value().toList()) {
+    try {
+      ClipboardItem item(NULL);
+      QDataStream s;
+      s << historyItem;
+      s >> item;
+      if (item.mimeData()) {
+        items_.push_back(ClipboardItem::Ptr(new ClipboardItem(item.mimeData())));
+      }
+    } catch (std::exception& ex) {
+      qxtLog->warning("unable to deserialize item. ex=", ex.what());
+    }
   }
 }
 

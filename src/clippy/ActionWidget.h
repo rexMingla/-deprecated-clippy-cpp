@@ -33,7 +33,6 @@ private slots:
 signals:
   void showSettingsSignal();
   void performActionSignal(const ClipboardItem&);
-  //void actionSelected(QObject object);
 };
 
 #endif // ACTIONWIDGET_H

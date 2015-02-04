@@ -30,7 +30,7 @@ static void setupLogs()
 
 int main(int argc, char *argv[])
 {
-  QApplication a(argc, argv);
+  QApplication* app = new QApplication(argc, argv);
   QApplication::setQuitOnLastWindowClosed(false); // closed via ActionWidget quit action
 
   if (!QSystemTrayIcon::isSystemTrayAvailable()) {
@@ -44,8 +44,10 @@ int main(int argc, char *argv[])
 
   Settings* settings = new Settings(QApplication::applicationDirPath() + "/clippy.ini");
   ConfigWidget* configWidget = new ConfigWidget(settings);
+  // there is no main window so this is the master parent. it must get deleted
   QWidget* parent = configWidget;
   ClipboardManager* clipboardManager = new ClipboardManager(settings, parent);
+  QObject::connect(app, SIGNAL(aboutToQuit()), clipboardManager, SLOT(saveConfig()));
 #ifdef Q_WS_MAC
   // only mac requires polling to get global keyboard changes. link in ClipboardPoller
   ClipboardPoller* clipboardPoller = new ClipboardPoller(settings, parent);
@@ -54,7 +56,6 @@ int main(int argc, char *argv[])
 
   //ActionExecutor* actionExecutor = new ActionExecutor(parent);
   ActionWidget* actionWidget = new ActionWidget(settings, clipboardManager, parent);
-  QObject::connect(actionWidget, SIGNAL(showSettingsSignal()), configWidget, SLOT(show()));
   QSystemTrayIcon* systemTray = new QSystemTrayIcon(parent);
   systemTray->setContextMenu(actionWidget->getMenu());
   QObject::connect(actionWidget, SIGNAL(showSettingsSignal()), configWidget, SLOT(show()));
@@ -65,10 +66,10 @@ int main(int argc, char *argv[])
   systemTray->show();
 
   try {
-    int ret = a.exec();
+    int ret = app->exec();
     qxtLog->info("App stopped by user");
     return ret;
-  } catch (std::exception ex) {
+  } catch (const std::exception& ex) {
     // todo: show a pop up
     qxtLog->warning("An error occured. ex=", ex.what());
     return 1;

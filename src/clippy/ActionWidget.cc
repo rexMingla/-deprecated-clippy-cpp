@@ -65,12 +65,12 @@ void ActionWidget::rebuildMenu() {
     historyAction->setEnabled(false);
   }
 
-  int numFreeItems = settings_->numFreeItems().value().toInt();
+  int numFreeItems = settings_->numFreeItems()->value().toInt();
   int i = 0;
   for (; i < std::min(items.size(), numFreeItems); ++i, ++it) {
     menu_->addAction(clipboardItemToAction(i + 1, *it, menu_));
   }
-  int numItemsPerGroup = settings_->numItemsPerGroup().value().toInt();
+  int numItemsPerGroup = settings_->numItemsPerGroup()->value().toInt();
   QMenu* subGroupMenu = NULL;
   for (; it != end; ++i, ++it) {
     if (((i - numFreeItems) % numItemsPerGroup) == 0) {

@@ -18,6 +18,7 @@ public:
 
 class NoopSettingValidator : public SettingValidator
 {
+public:
   explicit NoopSettingValidator();
   ~NoopSettingValidator();
 
