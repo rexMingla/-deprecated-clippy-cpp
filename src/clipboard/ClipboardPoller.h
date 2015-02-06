@@ -18,7 +18,7 @@ class ClipboardPoller : public QObject
   Q_OBJECT
 private:
   QTimer* timer_;
-  const QMimeData* lastClipboardContent_;
+  QMimeData* lastClipboardContent_;
   QClipboard* clipboard_;
 
 public:

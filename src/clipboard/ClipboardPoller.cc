@@ -1,8 +1,8 @@
 #include "ClipboardPoller.h"
 
 #include "ClipboardItem.h"
-#include "SettingItem.h"
-#include "Settings.h"
+#include "src/settings/SettingItem.h"
+#include "src/settings/Settings.h"
 
 #include "vendor/qxt/qxtlogger.h"
 
@@ -15,7 +15,7 @@
 ClipboardPoller::ClipboardPoller(Settings* settings, QObject* parent)
   : QObject(parent),
     timer_(new QTimer(this)),
-    lastClipboardContent_(NULL),
+    lastClipboardContent_(new QMimeData()),
     clipboard_(QApplication::clipboard()) {
   connect(timer_, SIGNAL(timeout()), this, SLOT(onTimeout()));
   connect(settings->clipboardRefreshTimeoutMillis(), SIGNAL(settingsChangedSignal(const QVariant&)),
@@ -35,7 +35,8 @@ void ClipboardPoller::onTimeout() {
     if (!isFirstTime) {
       delete lastClipboardContent_;
     }
-    lastClipboardContent_ = ClipboardItem::copyMimeData(newContent);
+    lastClipboardContent_->clear();
+    ClipboardItem::copyMimeData(newContent, *lastClipboardContent_);
     if (!isFirstTime) {
       qxtLog->debug("new content");
       emit clipboardChangedSignal();

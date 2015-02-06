@@ -1,8 +1,8 @@
 #include "ActionWidget.h"
-#include "ClipboardManager.h"
-#include "ClipboardPoller.h"
 #include "ConfigWidget.h"
-#include "Settings.h"
+#include "src/clipboard/ClipboardManager.h"
+#include "src/clipboard/ClipboardPoller.h"
+#include "src/settings/Settings.h"
 
 #include "vendor/qxt/qxtbasicfileloggerengine.h"
 #include "vendor/qxt/qxtbasicstdloggerengine.h"
@@ -14,8 +14,7 @@
 #include <QStyle>
 #include <QSystemTrayIcon>
 
-static void setupLogs()
-{
+static void setupLogs() {
   // thanks to qxt and http://ynonperek.com/qt-logging
   QxtBasicFileLoggerEngine* appLog  = new QxtBasicFileLoggerEngine("clippy.app.log");
   QxtBasicSTDLoggerEngine* debugLog = new QxtBasicSTDLoggerEngine();
@@ -28,8 +27,7 @@ static void setupLogs()
       | QxtLogger::WriteLevel );
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   QApplication* app = new QApplication(argc, argv);
   QApplication::setQuitOnLastWindowClosed(false); // closed via ActionWidget quit action
 

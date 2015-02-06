@@ -1,7 +1,6 @@
 #include "ConfigWidget.h"
-
-#include "Settings.h"
 #include "ui_ConfigWidget.h"
+#include "src/settings/Settings.h"
 
 #include <QObject>
 

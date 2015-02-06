@@ -5,7 +5,30 @@
 #include <QMimeData>
 #include <QTextDocument>
 
-ClipboardItem::ClipboardItem(const QMimeData* mimeData) : mimeData_(copyMimeData(mimeData)) {
+namespace {
+  // breaks the pre-processor, see:
+  // http://stackoverflow.com/questions/14216510/qt-foreach-with-templates-with-multiple-parameters
+  typedef QPair<QString, QByteArray> SerializedType;
+}
+
+ClipboardItem::ClipboardItem(const ClipboardItem& other)
+  : QObject(),
+    mimeData_(new QMimeData()) {
+  mimeData_->setParent(this);
+  copyMimeData(other.mimeData(), *mimeData_);
+}
+
+ClipboardItem::ClipboardItem(const QMimeData* mimeData, QObject* parent)
+  : QObject(parent),
+    mimeData_(new QMimeData()) {
+  mimeData_->setParent(this);
+  copyMimeData(mimeData, *mimeData_);
+}
+
+ClipboardItem& ClipboardItem::operator=(const ClipboardItem& other) {
+  mimeData_->clear();
+  copyMimeData(other.mimeData(), *mimeData_);
+  return *this;
 }
 
 ClipboardItem::~ClipboardItem() {
@@ -36,21 +59,24 @@ const QString ClipboardItem::displayText() const {
 }
 
 // see http://stackoverflow.com/questions/13762140/proper-way-to-copy-a-qmimedata-object
-QMimeData* ClipboardItem::copyMimeData(const QMimeData* from) {
-  QMimeData* mimeCopy = new QMimeData();
-  foreach(QString format, from->formats()) {
+void ClipboardItem::copyMimeData(const QMimeData* from, QMimeData& to) {
+  if (!from) {
+    qxtLog->debug("copyMimeData: null input");
+    return ;
+  }
+  foreach (QString format, from->formats()) {
     // Retrieving data
     QByteArray data = from->data(format);
     // Checking for custom MIME types
-    if(format.startsWith("application/x-qt")) {
+    if (format.startsWith("application/x-qt")) {
       // Retrieving true format name
       int indexBegin = format.indexOf('"') + 1;
       int indexEnd = format.indexOf('"', indexBegin);
       format = format.mid(indexBegin, indexEnd - indexBegin);
     }
-    mimeCopy->setData(format, data);
+    qxtLog->debug("copyMimeData: format=", format, "data=", data);
+    to.setData(format, data);
   }
-  return mimeCopy;
 }
 
 bool ClipboardItem::isMimeDataEqual(const QMimeData* left, const QMimeData* right) {
@@ -69,7 +95,7 @@ bool ClipboardItem::isMimeDataEqual(const QMimeData* left, const QMimeData* righ
         leftFormats.size(), " right=", rightFormats.size());
     return false;
   }
-  foreach(QString leftFormat, leftFormats) {
+  foreach (const QString& leftFormat, leftFormats) {
     if (!right->hasFormat(leftFormat)) {
       qxtLog->debug("isMimeDataEqual: right does not have format. format=", leftFormat);
       return false;
@@ -83,21 +109,38 @@ bool ClipboardItem::isMimeDataEqual(const QMimeData* left, const QMimeData* righ
   return true;
 }
 
-QDataStream& operator <<(QDataStream& istream, const ClipboardItem& item) {
+QByteArray ClipboardItem::serialize() const {
+  QByteArray serializer;
+  QDataStream stream(&serializer, QIODevice::WriteOnly);
+  stream << *this;
+  return serializer;
+}
+
+ClipboardItem* ClipboardItem::deserialize(QByteArray& data) {
+  ClipboardItem* item = new ClipboardItem();
+  QDataStream stream(&data, QIODevice::ReadOnly);
+  stream >> *item;
+  return item;
+}
+
+QDataStream& operator<<(QDataStream& istream, const ClipboardItem& item) {
   const QMimeData* data = item.mimeData();
+  QList<SerializedType> outData;
   foreach (const QString& format, data->formats()) {
-    istream << qMakePair(format, data->data(format));
+    QByteArray value = data->data(format);
+    outData << qMakePair(format, value);
   }
+  istream << outData;
   return istream;
 }
 
-QDataStream& operator >>(QDataStream& ostream, ClipboardItem& item) {
-  QMimeData mimeData;
-  while (!ostream.atEnd()) {
-    QString format;
-    QByteArray data;
-    ostream >> format >> data;
-    mimeData.setData(format, data);
+QDataStream& operator>>(QDataStream& ostream, ClipboardItem& item) {
+  QList<SerializedType> data;
+  ostream >> data;
+  QMimeData* mimeData = new QMimeData();
+  foreach (const SerializedType& dataItem, data) {
+    mimeData->setData(dataItem.first, dataItem.second);
   }
-  item = ClipboardItem(&mimeData);
+  item = ClipboardItem(mimeData);
+  return ostream;
 }

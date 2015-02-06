@@ -1,8 +1,8 @@
 #include "ActionWidget.h"
 
-#include "ClipboardManager.h"
-#include "SettingItem.h"
-#include "Settings.h"
+#include "src/clipboard/ClipboardManager.h"
+#include "src/settings/SettingItem.h"
+#include "src/settings/Settings.h"
 #include "vendor/qxt/qxtlogger.h"
 
 #include <QAction>

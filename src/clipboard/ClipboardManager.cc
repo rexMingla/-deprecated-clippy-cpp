@@ -1,7 +1,7 @@
 #include "ClipboardManager.h"
 
-#include "SettingItem.h"
-#include "Settings.h"
+#include "src/settings/SettingItem.h"
+#include "src/settings/Settings.h"
 
 #include "vendor/qxt/qxtlogger.h"
 
@@ -29,7 +29,6 @@ ClipboardManager::ClipboardManager(Settings* settings, QObject* parent)
 }
 
 ClipboardManager::~ClipboardManager() {
-  saveConfig();
 }
 
 void ClipboardManager::cleanupItems() {
@@ -41,36 +40,25 @@ void ClipboardManager::cleanupItems() {
 
 void ClipboardManager::saveConfig() {
   qxtLog->debug("saveConfig");
-  if (settings_->persistBetweenSessions()->value().toBool()) {
+  bool persistData = settings_->persistBetweenSessions()->value().toBool();
+  if (persistData) {
     QList<QVariant> list;
-    foreach (ClipboardItem::Ptr item, items_) {
-      try {
-        QDataStream s;
-        s << *item.data();
-        list << s;
-      } catch (std::exception& ex) {
-        qxtLog->warning("unable to serialize item. ex=", ex.what());
-      }
-      settings_->history()->setValue(list);
+    foreach (ClipboardItem* item, items_) {
+      list << item->serialize();
     }
+    settings_->history()->setValue(list);
   }
 }
 
 void ClipboardManager::loadConfig() {
   qxtLog->debug("loadConfig");
   items_.clear();
-  foreach (QVariant historyItem, settings_->history()->value().toList()) {
-    try {
-      ClipboardItem item(NULL);
-      QDataStream s;
-      s << historyItem;
-      s >> item;
-      if (item.mimeData()) {
-        items_.push_back(ClipboardItem::Ptr(new ClipboardItem(item.mimeData())));
-      }
-    } catch (std::exception& ex) {
-      qxtLog->warning("unable to deserialize item. ex=", ex.what());
-    }
+  QList<QVariant> list = settings_->history()->value().toList();
+  foreach (const QVariant& variantItem, list) {
+    QByteArray byteArray = variantItem.toByteArray();
+    ClipboardItem* item = ClipboardItem::deserialize(byteArray);
+    item->setParent(this);
+    items_.push_back(item);
   }
 }
 
@@ -78,7 +66,7 @@ void ClipboardManager::clearItems() {
   items_.clear();
 }
 
-void ClipboardManager::setMimeData(ClipboardItem::Ptr data) {
+void ClipboardManager::setMimeData(ClipboardItem* data) {
   qxtLog->debug("setMimeData");
   ignoreNextValue_ = true;
   clipboard_->setMimeData(data->mimeData());
@@ -96,10 +84,8 @@ void ClipboardManager::onClipboardChanged() {
     return;
   }
   qxtLog->debug("clipboard updated");
-
-  // example usage from http://qt-project.org/doc/qt-4.8/qclipboard.html
   const QMimeData* mimeData = clipboard_->mimeData();
-  items_.push_front(ClipboardItem::Ptr(new ClipboardItem(mimeData)));
+  items_.push_front(new ClipboardItem(mimeData, this));
   cleanupItems();
 }
 
@@ -108,6 +94,6 @@ void ClipboardManager::onMaxNumItemsChanged(const QVariant& value) {
   cleanupItems();
 }
 
-const QList<ClipboardItem::Ptr>& ClipboardManager::items() {
+const QList<ClipboardItem*>& ClipboardManager::items() {
   return items_;
 }

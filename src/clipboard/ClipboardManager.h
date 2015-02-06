@@ -18,7 +18,7 @@ class ClipboardManager : public QObject
   Q_OBJECT
 private:
   Settings* settings_;
-  QList<ClipboardItem::Ptr> items_;
+  QList<ClipboardItem*> items_;
   QClipboard* clipboard_;
   int maxSize_;
   bool ignoreNextValue_;
@@ -27,7 +27,7 @@ public:
   explicit ClipboardManager(Settings* settings, QObject* parent = 0);
   ~ClipboardManager();
 
-  const QList<ClipboardItem::Ptr>& items();
+  const QList<ClipboardItem*>& items();
 
 private:
   void cleanupItems();
@@ -36,7 +36,7 @@ private:
 public slots:
   void saveConfig();
   void clearItems();
-  void setMimeData(ClipboardItem::Ptr data);
+  void setMimeData(ClipboardItem* data);
   void setText(const QString& text);
 
 private slots:
