@@ -1,6 +1,8 @@
 #ifndef CLIPBOARDITEM_H
 #define CLIPBOARDITEM_H
 
+#include "Headers.h"
+
 #include <QMetaType>
 #include <QObject>
 #include <QString>
@@ -28,7 +30,9 @@ public:
     static ClipboardItem* deserialize(QByteArray& data);
 };
 
+Q_DECLARE_METATYPE(ClipboardItemPtr)
+
 QDataStream & operator<<(QDataStream & istream, const ClipboardItem& item);
-QDataStream& operator>>(QDataStream &ostream, ClipboardItem& item);
+QDataStream& operator>>(QDataStream& ostream, ClipboardItem& item);
 
 #endif // CLIPBOARDITEM_H

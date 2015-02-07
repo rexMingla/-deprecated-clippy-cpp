@@ -1,7 +1,9 @@
 #ifndef CLIPBOARDMANAGER_H
 #define CLIPBOARDMANAGER_H
 
-#include "ClipboardItem.h"
+#include "src/clipboard/Headers.h"
+
+#include "Headers.h"
 
 #include <QObject>
 #include <QList>
@@ -18,7 +20,7 @@ class ClipboardManager : public QObject
   Q_OBJECT
 private:
   Settings* settings_;
-  QList<ClipboardItem*> items_;
+  QList<ClipboardItemPtr> items_;
   QClipboard* clipboard_;
   int maxSize_;
   bool ignoreNextValue_;
@@ -27,7 +29,7 @@ public:
   explicit ClipboardManager(Settings* settings, QObject* parent = 0);
   ~ClipboardManager();
 
-  const QList<ClipboardItem*>& items();
+  const QList<ClipboardItemPtr>& items();
 
 private:
   void cleanupItems();

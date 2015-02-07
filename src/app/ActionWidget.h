@@ -1,6 +1,8 @@
 #ifndef ACTIONWIDGET_H
 #define ACTIONWIDGET_H
 
+#include "src/clipboard/Headers.h"
+
 #include <QWidget>
 
 class ClipboardItem;
@@ -25,6 +27,9 @@ public:
   ~ActionWidget();
 
   QMenu* getMenu();
+
+private:
+  QAction* clipboardItemToAction(int index, const ClipboardItemPtr item, QMenu* parent);
 
 private slots:
   void rebuildMenu();

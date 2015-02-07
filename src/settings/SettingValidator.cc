@@ -41,16 +41,14 @@ bool IntSettingValidator::isValid(const QVariant& value) const {
   return (min_.isAbsent() || intValue >= min_.get()) && (max_.isAbsent() || intValue <= max_.get());
 }
 
-int IntSettingValidator::getMin(bool* isOk) const
-{
+int IntSettingValidator::getMin(bool* isOk) const {
   if (isOk != NULL) {
     *isOk = !min_.isAbsent();
   }
   return min_.isAbsent() ? 0 : min_.get();
 }
 
-int IntSettingValidator::getMax(bool* isOk) const
-{
+int IntSettingValidator::getMax(bool* isOk) const {
   if (isOk != NULL) {
     *isOk =  max_.isAbsent();
   }

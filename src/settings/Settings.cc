@@ -7,15 +7,6 @@
 #include "vendor/qxt/qxtlogger.h"
 
 #include <QSettings>
-#include <QSharedPointer>
-
-namespace {
-  // keys for settings
-  static const QString NUM_FREE_ITEMS_KEY = "num_free_items";
-  static const QString NUM_ITEMS_PER_GROUP_KEY = "num_items_per_group";
-  static const QString MAX_ITEMS = "num_free_history_items";
-  static const QString PERSIST_BETWEEN_SESSIONS = "persist_between_sessions";
-}
 
 Settings::Settings(const QString& filename, QObject* parent)
   : QObject(parent)
@@ -49,6 +40,7 @@ Settings::Settings(const QString& filename, QObject* parent)
 }
 
 Settings::~Settings() {
+  qxtLog->warning("WTF");
 }
 
 SettingItem* Settings::numFreeItems() {
@@ -82,4 +74,9 @@ QList<SettingItem*>& Settings::settings() {
 void Settings::addItem(SettingItem* item) {
   settingList_.append(item);
   connect(item, SIGNAL(settingsChangedSignal(const QVariant&)), SIGNAL(settingsChangedSignal()));
+}
+
+void Settings::sync() {
+  qxtLog->warning("sync");
+  settings_->sync();
 }

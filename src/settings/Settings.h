@@ -36,6 +36,9 @@ public:
 private:
   void addItem(SettingItem* item);
 
+public slots:
+  void sync();
+
 signals:
   void settingsChangedSignal();
 };

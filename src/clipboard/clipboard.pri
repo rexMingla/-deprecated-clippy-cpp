@@ -6,4 +6,5 @@ SOURCES += \
 HEADERS += \
     src/clipboard/ClipboardManager.h \
     src/clipboard/ClipboardItem.h \
-    src/clipboard/ClipboardPoller.h
+    src/clipboard/ClipboardPoller.h \
+    $$PWD/Headers.h

@@ -22,6 +22,8 @@ ClipboardPoller::ClipboardPoller(Settings* settings, QObject* parent)
       SLOT(onTimeoutSettingsChanged(const QVariant&)));
   onTimeoutSettingsChanged(settings->clipboardRefreshTimeoutMillis()->value().toInt());
   timer_->start();
+  lastClipboardContent_->setParent(this);
+  ClipboardItem::copyMimeData(clipboard_->mimeData(), *lastClipboardContent_);
 }
 
 ClipboardPoller::~ClipboardPoller() {
@@ -30,17 +32,10 @@ ClipboardPoller::~ClipboardPoller() {
 
 void ClipboardPoller::onTimeout() {
   const QMimeData* newContent = clipboard_->mimeData();
-  if (newContent != NULL && !ClipboardItem::isMimeDataEqual(lastClipboardContent_, newContent)) {
-    bool isFirstTime = lastClipboardContent_ == NULL;
-    if (!isFirstTime) {
-      delete lastClipboardContent_;
-    }
-    lastClipboardContent_->clear();
+  if (newContent && !ClipboardItem::isMimeDataEqual(lastClipboardContent_, newContent)) {
     ClipboardItem::copyMimeData(newContent, *lastClipboardContent_);
-    if (!isFirstTime) {
-      qxtLog->debug("new content");
-      emit clipboardChangedSignal();
-    }
+    qxtLog->debug("new content");
+    emit clipboardChangedSignal();
   }
 }
 

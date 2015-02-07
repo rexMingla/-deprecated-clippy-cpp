@@ -23,7 +23,7 @@ public:
   }
 
 private Q_SLOTS:
-  /*void shouldReturnTrueForSameMimeData() {
+  void shouldReturnTrueForSameMimeData() {
     QVERIFY(ClipboardItem::isMimeDataEqual(text_, text_));
   }
 
@@ -32,22 +32,16 @@ private Q_SLOTS:
   }
 
   void shouldBeEqualWhenMimeDataIsCopied() {
-    QMimeData* copy = ClipboardItem::copyMimeData(text_);
-    QCOMPARE(copy->text(), QString("test"));
-    QVERIFY(ClipboardItem::isMimeDataEqual(text_, copy));
-  }*/
+    QMimeData toBeCopied;
+    ClipboardItem::copyMimeData(text_, toBeCopied);
+    QCOMPARE(toBeCopied.text(), QString("test"));
+    QVERIFY(ClipboardItem::isMimeDataEqual(text_, &toBeCopied));
+  }
 
   void shouldDeserializeTextDataBackToSameObject() {
-    qxtLog->warning("1.");
     ClipboardItem item(text_);
-    qxtLog->warning("2.");
     QByteArray itemData = item.serialize();
-    qxtLog->warning("3.");
     ClipboardItem* copy = ClipboardItem::deserialize(itemData);
-    qxtLog->warning("3a.");
-    copy->mimeData()->text();
-    qxtLog->warning("3b.");
-    qxtLog->warning("4.");
     QVERIFY(ClipboardItem::isMimeDataEqual(copy->mimeData(), text_));
   }
 };

@@ -13,7 +13,10 @@ SettingItem::SettingItem(QSettings* settings, const QString& key, const QVariant
     type_(type),
     validator_(validator),
     defaultValue_(defaultValue) {
-  setValue(defaultValue);
+  QVariant val = value();
+  if (val.isNull() || !validator_->isValid(val)) {
+    setValue(defaultValue);
+  }
 }
 
 SettingItem::~SettingItem() {

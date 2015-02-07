@@ -1,5 +1,6 @@
 #include "ClipboardManager.h"
 
+#include "ClipboardItem.h"
 #include "src/settings/SettingItem.h"
 #include "src/settings/Settings.h"
 
@@ -19,7 +20,7 @@ ClipboardManager::ClipboardManager(Settings* settings, QObject* parent)
     settings_(settings),
     clipboard_(QApplication::clipboard()),
     maxSize_(0),
-    ignoreNextValue_(true) // ignore next due to start up emission
+    ignoreNextValue_(false)
 {
   connect(settings_->maxNumItems(), SIGNAL(settingsChangedSignal(const QVariant&)),
       SLOT(onMaxNumItemsChanged(const QVariant&)));
@@ -29,6 +30,10 @@ ClipboardManager::ClipboardManager(Settings* settings, QObject* parent)
 }
 
 ClipboardManager::~ClipboardManager() {
+}
+
+const QList<ClipboardItemPtr>& ClipboardManager::items() {
+  return items_;
 }
 
 void ClipboardManager::cleanupItems() {
@@ -43,8 +48,9 @@ void ClipboardManager::saveConfig() {
   bool persistData = settings_->persistBetweenSessions()->value().toBool();
   if (persistData) {
     QList<QVariant> list;
-    foreach (ClipboardItem* item, items_) {
-      list << item->serialize();
+    foreach (const ClipboardItemPtr& item, items_) {
+      QByteArray array = item->serialize();
+      list << array;
     }
     settings_->history()->setValue(list);
   }
@@ -58,7 +64,7 @@ void ClipboardManager::loadConfig() {
     QByteArray byteArray = variantItem.toByteArray();
     ClipboardItem* item = ClipboardItem::deserialize(byteArray);
     item->setParent(this);
-    items_.push_back(item);
+    items_.push_back(ClipboardItemPtr(item));
   }
 }
 
@@ -85,15 +91,11 @@ void ClipboardManager::onClipboardChanged() {
   }
   qxtLog->debug("clipboard updated");
   const QMimeData* mimeData = clipboard_->mimeData();
-  items_.push_front(new ClipboardItem(mimeData, this));
+  items_.push_front(ClipboardItemPtr(new ClipboardItem(mimeData, this)));
   cleanupItems();
 }
 
 void ClipboardManager::onMaxNumItemsChanged(const QVariant& value) {
   maxSize_ = value.toInt();
   cleanupItems();
-}
-
-const QList<ClipboardItem*>& ClipboardManager::items() {
-  return items_;
 }

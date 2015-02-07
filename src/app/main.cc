@@ -46,6 +46,8 @@ int main(int argc, char *argv[]) {
   QWidget* parent = configWidget;
   ClipboardManager* clipboardManager = new ClipboardManager(settings, parent);
   QObject::connect(app, SIGNAL(aboutToQuit()), clipboardManager, SLOT(saveConfig()));
+  // TODO: fix this. have one class to manage all the setting changes
+  QObject::connect(app, SIGNAL(aboutToQuit()), settings, SLOT(sync()));
 #ifdef Q_WS_MAC
   // only mac requires polling to get global keyboard changes. link in ClipboardPoller
   ClipboardPoller* clipboardPoller = new ClipboardPoller(settings, parent);
