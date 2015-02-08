@@ -35,7 +35,7 @@ void SettingItem::setValue(const QVariant& value) {
   if (validator_->isValid(value)) {
     qxtLog->debug("set value. key=", key_, " value=", value);
     settings_->setValue(key_, value);
-    //emit settingsChangedSignal(value);
+    emit settingsChangedSignal(value);
   } else {
     qxtLog->warning("Setting value ignored as it's invalid. key=", key_, " ignored value=", value);
   }

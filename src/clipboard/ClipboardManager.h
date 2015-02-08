@@ -13,37 +13,35 @@ class QImage;
 class QMimeData;
 class QPixmap;
 class QString;
-class Settings;
 
 class ClipboardManager : public QObject
 {
   Q_OBJECT
 private:
-  Settings* settings_;
   QList<ClipboardItemPtr> items_;
   QClipboard* clipboard_;
   int maxSize_;
   bool ignoreNextValue_;
 
 public:
-  explicit ClipboardManager(Settings* settings, QObject* parent = 0);
+  explicit ClipboardManager(QObject* parent = 0);
   ~ClipboardManager();
 
+  void addItem(ClipboardItemPtr item);
   const QList<ClipboardItemPtr>& items();
 
 private:
   void cleanupItems();
-  void loadConfig();
 
 public slots:
-  void saveConfig();
   void clearItems();
   void setMimeData(ClipboardItem* data);
   void setText(const QString& text);
 
+  void setMaxSize(int maxSize);
+
 private slots:
   void onClipboardChanged();
-  void onMaxNumItemsChanged(const QVariant& value);
 };
 
 #endif // CLIPBOARDMANAGER_H

@@ -12,18 +12,17 @@
 #include <QTimer>
 #include <QVariant>
 
-ClipboardPoller::ClipboardPoller(Settings* settings, QObject* parent)
+ClipboardPoller::ClipboardPoller(QObject* parent)
   : QObject(parent),
     timer_(new QTimer(this)),
     lastClipboardContent_(new QMimeData()),
     clipboard_(QApplication::clipboard()) {
   connect(timer_, SIGNAL(timeout()), this, SLOT(onTimeout()));
-  connect(settings->clipboardRefreshTimeoutMillis(), SIGNAL(settingsChangedSignal(const QVariant&)),
-      SLOT(onTimeoutSettingsChanged(const QVariant&)));
-  onTimeoutSettingsChanged(settings->clipboardRefreshTimeoutMillis()->value().toInt());
-  timer_->start();
+
   lastClipboardContent_->setParent(this);
   ClipboardItem::copyMimeData(clipboard_->mimeData(), *lastClipboardContent_);
+
+  setClipboardRefreshTimeoutMillis(1000); // 1 sec
 }
 
 ClipboardPoller::~ClipboardPoller() {
@@ -39,8 +38,7 @@ void ClipboardPoller::onTimeout() {
   }
 }
 
-void ClipboardPoller::onTimeoutSettingsChanged(const QVariant& timeoutMillis) {
-  timer_->setInterval(1000 * timeoutMillis.toFloat());
+void ClipboardPoller::setClipboardRefreshTimeoutMillis(int value) {
+  timer_->setInterval(value);
   timer_->start();
 }
-

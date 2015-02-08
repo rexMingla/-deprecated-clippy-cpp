@@ -16,7 +16,7 @@ private:
   SettingItem* numFreeItems_;
   SettingItem* numItemsPerGroup_;
   SettingItem* maxNumItems_;
-  SettingItem* clipboardRefreshTimeoutMillis_;
+  SettingItem* clipboardRefreshTimeoutSecs_;
   SettingItem* persistBetweenSessions_;
   SettingItem* history_;
   QList<SettingItem*> settingList_;
@@ -28,7 +28,7 @@ public:
   SettingItem* numFreeItems();
   SettingItem* numItemsPerGroup();
   SettingItem* maxNumItems();
-  SettingItem* clipboardRefreshTimeoutMillis();
+  SettingItem* clipboardRefreshTimeoutSecs();
   SettingItem* persistBetweenSessions();
   SettingItem* history();
   QList<SettingItem*>& settings();

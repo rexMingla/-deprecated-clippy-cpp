@@ -1,8 +1,10 @@
 #include "ActionWidget.h"
 #include "ConfigWidget.h"
+#include "SettingCoordinator.h"
 #include "src/clipboard/ClipboardManager.h"
 #include "src/clipboard/ClipboardPoller.h"
 #include "src/settings/Settings.h"
+#include "src/global/Optional.h"
 
 #include "vendor/qxt/qxtbasicfileloggerengine.h"
 #include "vendor/qxt/qxtbasicstdloggerengine.h"
@@ -44,18 +46,17 @@ int main(int argc, char *argv[]) {
   ConfigWidget* configWidget = new ConfigWidget(settings);
   // there is no main window so this is the master parent. it must get deleted
   QWidget* parent = configWidget;
-  ClipboardManager* clipboardManager = new ClipboardManager(settings, parent);
-  QObject::connect(app, SIGNAL(aboutToQuit()), clipboardManager, SLOT(saveConfig()));
-  // TODO: fix this. have one class to manage all the setting changes
-  QObject::connect(app, SIGNAL(aboutToQuit()), settings, SLOT(sync()));
+
+  ClipboardManager* clipboardManager = new ClipboardManager(parent);
+  Optional<ClipboardPoller*> clipboardPoller = Optional<ClipboardPoller*>::absent();
 #ifdef Q_WS_MAC
   // only mac requires polling to get global keyboard changes. link in ClipboardPoller
-  ClipboardPoller* clipboardPoller = new ClipboardPoller(settings, parent);
-  QObject::connect(clipboardPoller, SIGNAL(clipboardChangedSignal()), clipboardManager, SLOT(onClipboardChanged()));
+  clipboardPoller = Optional<ClipboardPoller*>::of(new ClipboardPoller(parent));
+  QObject::connect(clipboardPoller.get(), SIGNAL(clipboardChangedSignal()), clipboardManager, SLOT(onClipboardChanged()));
 #endif // Q_WS_MAC
 
   //ActionExecutor* actionExecutor = new ActionExecutor(parent);
-  ActionWidget* actionWidget = new ActionWidget(settings, clipboardManager, parent);
+  ActionWidget* actionWidget = new ActionWidget(clipboardManager, parent);
   QSystemTrayIcon* systemTray = new QSystemTrayIcon(parent);
   systemTray->setContextMenu(actionWidget->getMenu());
   QObject::connect(actionWidget, SIGNAL(showSettingsSignal()), configWidget, SLOT(show()));
@@ -64,6 +65,10 @@ int main(int argc, char *argv[]) {
   QIcon icon(":/resources/icon.png");
   systemTray->setIcon(icon);
   systemTray->show();
+
+  SettingCoordinator* settingCoordinator = new SettingCoordinator(
+      actionWidget, clipboardManager, clipboardPoller, settings, parent);
+  settingCoordinator->loadConfig();
 
   try {
     int ret = app->exec();

@@ -3,8 +3,6 @@
 #include "src/clipboard/ClipboardItem.h"
 #include "src/clipboard/ClipboardManager.h"
 #include "src/clipboard/Headers.h"
-#include "src/settings/SettingItem.h"
-#include "src/settings/Settings.h"
 #include "vendor/qxt/qxtlogger.h"
 
 #include <QAction>
@@ -15,20 +13,19 @@ namespace {
   static const int MENU_MAX_WIDTH = 200;
 }
 
-ActionWidget::ActionWidget(Settings* settings, ClipboardManager* clipboardManager, QWidget* parent)
+ActionWidget::ActionWidget(ClipboardManager* clipboardManager, QWidget* parent)
   : QWidget(parent),
-    settings_(settings),
     clipboardManager_(clipboardManager),
     menu_(new QMenu(this)),
     quitAction_(new QAction("&Quit clippy", this)),
     clearHistoryAction_(new QAction("Clear History", this)),
-    showSettingsAction_(new QAction("Show Settings...", this)) {
-
+    showSettingsAction_(new QAction("Show Settings...", this)),
+    numItemsPerGroup_(10),
+    numFreeItems_(10) {
   connect(showSettingsAction_, SIGNAL(triggered()), SIGNAL(showSettingsSignal()));
   connect(menu_, SIGNAL(aboutToShow()), SLOT(rebuildMenu()));
   connect(clearHistoryAction_, SIGNAL(triggered()), clipboardManager, SLOT(clearItems()));
 
-  // from http://qt-project.org/doc/qt-4.8/qapplication.html#closeAllWindows
   quitAction_->setShortcuts(QKeySequence::Quit);
   connect(quitAction_, SIGNAL(triggered()), qApp, SLOT(quit()));
 }
@@ -38,6 +35,14 @@ ActionWidget::~ActionWidget() {
 
 QMenu* ActionWidget::getMenu() {
   return menu_;
+}
+
+void ActionWidget::setNumItemsPerGroup(int numItemsPerGroup) {
+  numItemsPerGroup_ = numItemsPerGroup;
+}
+
+void ActionWidget::setNumFreeItems(int numFreeItems) {
+  numFreeItems_ = numFreeItems;
 }
 
 QAction* ActionWidget::clipboardItemToAction(int index, const ClipboardItemPtr item, QMenu* parent) {
@@ -66,16 +71,14 @@ void ActionWidget::rebuildMenu() {
     historyAction->setEnabled(false);
   }
 
-  int numFreeItems = settings_->numFreeItems()->value().toInt();
   int i = 0;
-  for (; i < std::min(items.size(), numFreeItems); ++i, ++it) {
+  for (; i < std::min(items.size(), numFreeItems_); ++i, ++it) {
     menu_->addAction(clipboardItemToAction(i + 1, *it, menu_));
   }
-  int numItemsPerGroup = settings_->numItemsPerGroup()->value().toInt();
   QMenu* subGroupMenu = NULL;
   for (; it != end; ++i, ++it) {
-    if (((i - numFreeItems) % numItemsPerGroup) == 0) {
-      subGroupMenu = new QMenu(QString("%1 - %2").arg(i + 1).arg(i + numItemsPerGroup));
+    if (((i - numFreeItems_) % numItemsPerGroup_) == 0) {
+      subGroupMenu = new QMenu(QString("%1 - %2").arg(i + 1).arg(i + numItemsPerGroup_));
       subGroupMenu->setToolTip("");
       connect(subGroupMenu, SIGNAL(triggered(QAction*)), SLOT(onActionTriggered(QAction*)));
       menu_->addMenu(subGroupMenu);

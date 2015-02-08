@@ -9,24 +9,27 @@ class ClipboardItem;
 class ClipboardManager;
 class QAction;
 class QMenu;
-class Settings;
 
 class ActionWidget : public QWidget
 {
   Q_OBJECT
 private:
-  Settings* settings_;
   ClipboardManager* clipboardManager_;
   QMenu* menu_;
   QAction* quitAction_;
   QAction* clearHistoryAction_;
   QAction* showSettingsAction_;
+  int numItemsPerGroup_;
+  int numFreeItems_;
 
 public:
-  explicit ActionWidget(Settings* settings, ClipboardManager* clipboardManager, QWidget* parent = 0);
+  explicit ActionWidget(ClipboardManager* clipboardManager, QWidget* parent = 0);
   ~ActionWidget();
 
   QMenu* getMenu();
+
+  void setNumItemsPerGroup(int numItemsPerGroup);
+  void setNumFreeItems(int numFreeItems);
 
 private:
   QAction* clipboardItemToAction(int index, const ClipboardItemPtr item, QMenu* parent);

@@ -81,28 +81,21 @@ void ClipboardItem::copyMimeData(const QMimeData* from, QMimeData& to) {
 
 bool ClipboardItem::isMimeDataEqual(const QMimeData* left, const QMimeData* right) {
   if (left == NULL && right == NULL) {
-    qxtLog->debug("isMimeDataEqual: both null");
     return true;
   }
   if (left == NULL || right == NULL) {
-    qxtLog->debug("isMimeDataEqual: one of the values was null");
     return false;
   }
   QStringList leftFormats = left->formats();
   QStringList rightFormats = right->formats();
   if (leftFormats.size() != rightFormats.size()) {
-    qxtLog->debug("isMimeDataEqual: number of formats do not match. left=",
-        leftFormats.size(), " right=", rightFormats.size());
     return false;
   }
   foreach (const QString& leftFormat, leftFormats) {
     if (!right->hasFormat(leftFormat)) {
-      qxtLog->debug("isMimeDataEqual: right does not have format. format=", leftFormat);
       return false;
     }
     if (left->data(leftFormat) != right->data(leftFormat)) {
-      qxtLog->debug("isMimeDataEqual: data mismatch for format. format=", leftFormat,
-          " left=", left->data(leftFormat), "right=", right->data(leftFormat));
       return false;
     }
   }

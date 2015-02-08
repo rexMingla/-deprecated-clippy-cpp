@@ -32,10 +32,10 @@ Settings::Settings(const QString& filename, QObject* parent)
 #ifdef Q_WS_MAC
   QList<QVariant> timeoutValues;
   timeoutValues << QVariant(0.25) << QVariant(0.5) << QVariant(0.75) << QVariant(1.0);
-  clipboardRefreshTimeoutMillis_ =  new SettingItem(settings_,
+  clipboardRefreshTimeoutSecs_ =  new SettingItem(settings_,
       "clipboard_refresh_timeout_ms", QVariant(0.5),
       SettingItem::FLOAT, new ChoiceSettingValidator(timeoutValues));
-  addItem(clipboardRefreshTimeoutMillis_);
+  addItem(clipboardRefreshTimeoutSecs_);
 #endif
 }
 
@@ -55,8 +55,8 @@ SettingItem* Settings::maxNumItems() {
   return maxNumItems_;
 }
 
-SettingItem* Settings::clipboardRefreshTimeoutMillis() {
-  return clipboardRefreshTimeoutMillis_;
+SettingItem* Settings::clipboardRefreshTimeoutSecs() {
+  return clipboardRefreshTimeoutSecs_;
 }
 
 SettingItem* Settings::persistBetweenSessions() {

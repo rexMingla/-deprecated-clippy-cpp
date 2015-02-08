@@ -6,7 +6,6 @@
 class QClipboard;
 class QMimeData;
 class QTimer;
-class Settings;
 
 /**
  * @brief Class required because macx os does not provide global clipboard
@@ -22,15 +21,16 @@ private:
   QClipboard* clipboard_;
 
 public:
-  explicit ClipboardPoller(Settings* settings, QObject *parent = 0);
+  explicit ClipboardPoller(QObject *parent = 0);
   ~ClipboardPoller();
+
+  void setClipboardRefreshTimeoutMillis(int value);
 
 signals:
   void clipboardChangedSignal();
 
 private slots:
   void onTimeout();
-  void onTimeoutSettingsChanged(const QVariant& timeoutMillis);
 };
 
 #endif // CLIPBOARDPOLLER_H

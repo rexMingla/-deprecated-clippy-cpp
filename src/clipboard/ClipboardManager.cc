@@ -1,8 +1,6 @@
 #include "ClipboardManager.h"
 
 #include "ClipboardItem.h"
-#include "src/settings/SettingItem.h"
-#include "src/settings/Settings.h"
 
 #include "vendor/qxt/qxtlogger.h"
 
@@ -15,21 +13,20 @@
 #include <QString>
 #include <QTimer>
 
-ClipboardManager::ClipboardManager(Settings* settings, QObject* parent)
+ClipboardManager::ClipboardManager(QObject* parent)
   : QObject(parent),
-    settings_(settings),
     clipboard_(QApplication::clipboard()),
-    maxSize_(0),
-    ignoreNextValue_(false)
-{
-  connect(settings_->maxNumItems(), SIGNAL(settingsChangedSignal(const QVariant&)),
-      SLOT(onMaxNumItemsChanged(const QVariant&)));
+    maxSize_(100),
+    ignoreNextValue_(false) {
   connect(clipboard_, SIGNAL(dataChanged()), this, SLOT(onClipboardChanged()));
-  onMaxNumItemsChanged(settings_->maxNumItems()->value().toInt());
-  loadConfig();
 }
 
 ClipboardManager::~ClipboardManager() {
+}
+
+void ClipboardManager::addItem(ClipboardItemPtr item) {
+  item->setParent(this); // steal ownership
+  items_.push_back(item);
 }
 
 const QList<ClipboardItemPtr>& ClipboardManager::items() {
@@ -40,31 +37,6 @@ void ClipboardManager::cleanupItems() {
   if (items_.size() > maxSize_) {
      // could be more efficient here as it's likely only one item
     items_ = items_.mid(0, maxSize_);
-  }
-}
-
-void ClipboardManager::saveConfig() {
-  qxtLog->debug("saveConfig");
-  bool persistData = settings_->persistBetweenSessions()->value().toBool();
-  if (persistData) {
-    QList<QVariant> list;
-    foreach (const ClipboardItemPtr& item, items_) {
-      QByteArray array = item->serialize();
-      list << array;
-    }
-    settings_->history()->setValue(list);
-  }
-}
-
-void ClipboardManager::loadConfig() {
-  qxtLog->debug("loadConfig");
-  items_.clear();
-  QList<QVariant> list = settings_->history()->value().toList();
-  foreach (const QVariant& variantItem, list) {
-    QByteArray byteArray = variantItem.toByteArray();
-    ClipboardItem* item = ClipboardItem::deserialize(byteArray);
-    item->setParent(this);
-    items_.push_back(ClipboardItemPtr(item));
   }
 }
 
@@ -84,6 +56,11 @@ void ClipboardManager::setText(const QString& text) {
   clipboard_->setText(text);
 }
 
+void ClipboardManager::setMaxSize(int maxSize) {
+  maxSize_ = maxSize;
+  cleanupItems();
+}
+
 void ClipboardManager::onClipboardChanged() {
   if (ignoreNextValue_) {
     ignoreNextValue_ = false;
@@ -92,10 +69,5 @@ void ClipboardManager::onClipboardChanged() {
   qxtLog->debug("clipboard updated");
   const QMimeData* mimeData = clipboard_->mimeData();
   items_.push_front(ClipboardItemPtr(new ClipboardItem(mimeData, this)));
-  cleanupItems();
-}
-
-void ClipboardManager::onMaxNumItemsChanged(const QVariant& value) {
-  maxSize_ = value.toInt();
   cleanupItems();
 }
