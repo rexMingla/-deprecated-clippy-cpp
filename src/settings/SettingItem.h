@@ -17,7 +17,8 @@ public:
     BOOL,
     STRING,
     FLOAT,
-    LIST
+    LIST,
+    KEY_SEQUENCE
   };
 
   QSettings* settings_;

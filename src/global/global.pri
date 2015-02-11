@@ -1,1 +1,1 @@
-HEADERS += src/global/Optional.h
+HEADERS += $$PWD/Optional.h

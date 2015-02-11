@@ -64,17 +64,10 @@ void ClipboardItem::copyMimeData(const QMimeData* from, QMimeData& to) {
     qxtLog->debug("copyMimeData: null input");
     return ;
   }
-  foreach (QString format, from->formats()) {
-    // Retrieving data
+  to.clear();
+  foreach (const QString& format, from->formats()) {
     QByteArray data = from->data(format);
-    // Checking for custom MIME types
-    if (format.startsWith("application/x-qt")) {
-      // Retrieving true format name
-      int indexBegin = format.indexOf('"') + 1;
-      int indexEnd = format.indexOf('"', indexBegin);
-      format = format.mid(indexBegin, indexEnd - indexBegin);
-    }
-    qxtLog->debug("copyMimeData: format=", format, "data=", data);
+    qxtLog->debug("copyMimeData: format=", format, " data len=", data.size());
     to.setData(format, data);
   }
 }

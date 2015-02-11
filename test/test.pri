@@ -10,5 +10,5 @@ include(clipboard/test_clipboard.pri)
 
 # thanks to http://qtcreator.blogspot.ca/2010/04/sample-multiple-unit-test-project.html
 SOURCES += \
-    test/test_main.cc \
-    test/AutoTest.h
+    $$PWD/test_main.cc \
+    $$PWD/AutoTest.h

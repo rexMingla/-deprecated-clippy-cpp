@@ -1,10 +1,12 @@
 #include "ActionWidget.h"
+#include "ActionExecutor.h"
 #include "ConfigWidget.h"
 #include "SettingCoordinator.h"
 #include "src/clipboard/ClipboardManager.h"
 #include "src/clipboard/ClipboardPoller.h"
-#include "src/settings/Settings.h"
 #include "src/global/Optional.h"
+#include "src/os/OsManager.h"
+#include "src/settings/Settings.h"
 
 #include "vendor/qxt/qxtbasicfileloggerengine.h"
 #include "vendor/qxt/qxtbasicstdloggerengine.h"
@@ -61,14 +63,17 @@ int main(int argc, char *argv[]) {
   systemTray->setContextMenu(actionWidget->getMenu());
   QObject::connect(actionWidget, SIGNAL(showSettingsSignal()), configWidget, SLOT(show()));
 
+  OsManager* osManager = new OsManager();
+  ActionExecutor* actionExecutor = new ActionExecutor(osManager, actionWidget, parent);
+
+  SettingCoordinator* settingCoordinator = new SettingCoordinator(
+      actionWidget, clipboardManager, clipboardPoller, actionExecutor, settings, parent);
+  settingCoordinator->loadConfig();
+
   // thanks to http://www.flaticon.com/free-icon/verification-of-delivery-list-clipboard-symbol_45802
   QIcon icon(":/resources/icon.png");
   systemTray->setIcon(icon);
   systemTray->show();
-
-  SettingCoordinator* settingCoordinator = new SettingCoordinator(
-      actionWidget, clipboardManager, clipboardPoller, settings, parent);
-  settingCoordinator->loadConfig();
 
   try {
     int ret = app->exec();

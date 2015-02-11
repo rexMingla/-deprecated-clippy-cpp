@@ -1,10 +1,10 @@
 SOURCES += \
-    src/clipboard/ClipboardManager.cc \
-    src/clipboard/ClipboardItem.cc \
-    src/clipboard/ClipboardPoller.cc
+    $$PWD/ClipboardManager.cc \
+    $$PWD/ClipboardItem.cc \
+    $$PWD/ClipboardPoller.cc
 
 HEADERS += \
-    src/clipboard/ClipboardManager.h \
-    src/clipboard/ClipboardItem.h \
-    src/clipboard/ClipboardPoller.h \
+    $$PWD/ClipboardManager.h \
+    $$PWD/ClipboardItem.h \
+    $$PWD/ClipboardPoller.h \
     $$PWD/Headers.h

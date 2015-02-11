@@ -1,0 +1,120 @@
+#include "Process_p.h"
+
+//#include "OsxKeyMapper.h"
+#include "vendor/qxt/qxtlogger.h"
+#include "vendor/qxt/qxtglobalshortcut_p.h"
+
+#include <ApplicationServices/ApplicationServices.h>
+#include <QKeySequence>
+#include <QSharedPointer>
+
+namespace {
+  static const int BUFFER_SIZE = 256;
+
+  static const Qt::KeyboardModifiers ALL_MODS = Qt::ShiftModifier | Qt::ControlModifier | Qt::AltModifier | Qt::MetaModifier;
+
+  QString CFStringRefToQString(const CFStringRef& ref, int bufferSize) {
+    char* buffer = new char[bufferSize];
+    CFStringGetCString(ref, buffer, bufferSize, 0);
+    QString ret(buffer);
+    delete[] buffer;
+    return ret;
+  }
+
+  struct KeyEvent {
+    CGKeyCode keyCode_;
+    CGEventRef keyUp_;
+    CGEventRef keyDown_;
+
+    KeyEvent(CGKeyCode keyCode)
+      : keyCode_(keyCode),
+        keyUp_(CGEventCreateKeyboardEvent(NULL, keyCode, false)),
+        keyDown_(CGEventCreateKeyboardEvent(NULL, keyCode, true)) {
+      qxtLog->debug("KeyEvent");
+    }
+
+    ~KeyEvent() {
+      qxtLog->debug("~KeyEvent");
+      CFRelease(keyUp_);
+      CFRelease(keyDown_);
+    }
+  };
+
+  typedef QSharedPointer<KeyEvent> KeyEventPtr;
+  QList<KeyEventPtr> getKeysFromQKeySequence(const QKeySequence& keySequence) {
+    QList<KeyEventPtr> keys;
+    if (keySequence.isEmpty()) {
+      qxtLog->warning("empty key sequence receIved. not action to be taken");
+      return keys;
+    }
+    Qt::KeyboardModifiers modifiers = Qt::KeyboardModifiers(keySequence[0] & ALL_MODS);
+    // from HiToolbox.Framework Events.h
+    if (modifiers & Qt::ShiftModifier) {
+      keys.append(KeyEventPtr(new KeyEvent(0x38))); // kVK_Shift
+    }
+    if (modifiers & Qt::ControlModifier){
+      keys.append(KeyEventPtr(new KeyEvent(0x3B))); // kVK_Control
+    }
+    if (modifiers & Qt::AltModifier) {
+      keys.append(KeyEventPtr(new KeyEvent(0x3A))); // kVK_Option
+    }
+    if (modifiers & Qt::MetaModifier) {
+      keys.append(KeyEventPtr(new KeyEvent(0x37))); // kVK_Command
+    }
+    Qt::Key key = Qt::Key((keySequence[0] ^ ALL_MODS) & keySequence[0]);
+    keys.append(KeyEventPtr(new KeyEvent(QxtGlobalShortcutPrivate::nativeKeycode(key))));
+    return keys;
+  }
+}
+
+ProcessPrivate::ProcessPrivate()
+  : psn_(new ProcessSerialNumber()) {
+
+  OSStatus err = GetFrontProcess(psn_);
+  qxtLog->debug("GetFrontProcess processSerialNumber={",
+      (qulonglong) psn_->lowLongOfPSN, ",", (qulonglong) psn_->highLongOfPSN, "} response=", (int) err);
+  if (err != noErr) {
+    return ;
+  }
+
+  CFStringRef processName = NULL;
+  err = CopyProcessName(psn_, &processName);
+  processName_ = CFStringRefToQString(processName, BUFFER_SIZE);
+  CFRelease(processName);
+  qxtLog->debug("GetFrontProcess processName=", processName_);
+}
+
+ProcessPrivate::~ProcessPrivate() {
+  delete psn_;
+}
+
+void ProcessPrivate::setAsFocusedWindow() {
+  if (!isValid()) {
+    qxtLog->info("setAsFocusedWindow: no current process. ignoring command");
+    return ;
+  }
+
+  OSStatus err = SetFrontProcess(psn_);
+  qxtLog->debug("SetFrontProcess processName=", processName_, " response=", (int) err);
+}
+
+void ProcessPrivate::sendKeys(const QKeySequence& keySequence) {
+  if (!isValid()) {
+    qxtLog->info("sendKeys: no current process. ignoring command");
+    return ;
+  }
+  qxtLog->debug("sendKeys keys=", keySequence);
+
+  QList<KeyEventPtr> keyEvents = getKeysFromQKeySequence(keySequence);
+  qxtLog->debug(keyEvents.size(), " keys found");
+  foreach (const KeyEventPtr& keyEvent, keyEvents) {
+    CGEventPostToPSN(psn_, keyEvent->keyDown_);
+  }
+  foreach (const KeyEventPtr& keyEvent, keyEvents) {
+    CGEventPostToPSN(psn_, keyEvent->keyUp_);
+  }v
+}
+
+bool ProcessPrivate::isValid() const {
+  return !processName_.isEmpty();
+}

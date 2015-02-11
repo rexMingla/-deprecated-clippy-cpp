@@ -1,1 +1,1 @@
-SOURCES += test/clipboard/ClipboardItemTest.cc
+SOURCES += $$PWD/ClipboardItemTest.cc

@@ -4,7 +4,6 @@
 #include <stddef.h>
 
 template <typename T>
-
 class Optional
 {
 private:

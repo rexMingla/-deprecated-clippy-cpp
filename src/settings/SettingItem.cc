@@ -28,12 +28,14 @@ SettingItem::SettingType SettingItem::type() const {
 }
 
 QVariant SettingItem::value() const {
-  return settings_->value(key_);
+  QVariant val = settings_->value(key_);
+  qxtLog->debug("value. key=", key_, " value=", val);
+  return val;
 }
 
 void SettingItem::setValue(const QVariant& value) {
   if (validator_->isValid(value)) {
-    qxtLog->debug("set value. key=", key_, " value=", value);
+    //qxtLog->debug("set value. key=", key_, " value=", value);
     settings_->setValue(key_, value);
     emit settingsChangedSignal(value);
   } else {

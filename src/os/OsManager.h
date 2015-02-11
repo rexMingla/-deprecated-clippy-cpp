@@ -3,19 +3,16 @@
 
 #include <QObject>
 
+class Process;
+
 class OsManager : public QObject
 {
     Q_OBJECT
 public:
-    explicit OsManager(QObject* parent = 0);
-    ~OsManager();
+  explicit OsManager(QObject* parent = 0);
+  ~OsManager();
 
-signals:
-
-public slots:
-
-private:
-
+  Process focusedWindow();
 };
 
 #endif // OSMANAGER_H

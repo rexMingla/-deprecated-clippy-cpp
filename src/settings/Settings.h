@@ -19,6 +19,8 @@ private:
   SettingItem* clipboardRefreshTimeoutSecs_;
   SettingItem* persistBetweenSessions_;
   SettingItem* history_;
+  SettingItem* launchShortcutKeySequence_;
+
   QList<SettingItem*> settingList_;
 
 public:
@@ -31,13 +33,15 @@ public:
   SettingItem* clipboardRefreshTimeoutSecs();
   SettingItem* persistBetweenSessions();
   SettingItem* history();
+  SettingItem* launchShortcutKeySequence();
   QList<SettingItem*>& settings();
 
 private:
   void addItem(SettingItem* item);
 
 public slots:
-  void sync();
+  void loadConfig();
+  void saveConfig();
 
 signals:
   void settingsChangedSignal();

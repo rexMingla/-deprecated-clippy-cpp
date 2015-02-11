@@ -1,5 +1,6 @@
 #include "SettingCoordinator.h"
 
+#include "ActionExecutor.h"
 #include "ActionWidget.h"
 #include "src/clipboard/ClipboardItem.h"
 #include "src/clipboard/ClipboardManager.h"
@@ -7,19 +8,23 @@
 #include "src/settings/Settings.h"
 #include "src/settings/SettingItem.h"
 
+#include "vendor/qxt/qxtglobalshortcut.h"
 #include "vendor/qxt/qxtlogger.h"
 
 #include <QApplication>
+#include <QKeySequence>
 
 SettingCoordinator::SettingCoordinator(ActionWidget* actionWidget,
     ClipboardManager* clipboardManager,
     Optional<ClipboardPoller*> clipboardPoller,
+    ActionExecutor* actionExecutor,
     Settings* settings,
-    QObject *parent)
+    QObject* parent)
   : QObject(parent),
     actionWidget_(actionWidget),
     clipboardManager_(clipboardManager),
     clipboardPoller_(clipboardPoller),
+    actionExecutor_(actionExecutor),
     settings_(settings) {
 
   // setup action widget
@@ -31,12 +36,18 @@ SettingCoordinator::SettingCoordinator(ActionWidget* actionWidget,
   // setup clipboard manager
   connect(settings_->maxNumItems(), SIGNAL(settingsChangedSignal(const QVariant&)),
       SLOT(onMaxNumItemsChanged(const QVariant&)));
+  connect(settings_->history(), SIGNAL(settingsChangedSignal(const QVariant&)),
+      SLOT(onHistoryChanged(const QVariant&)));
 
   // setup clipboard poller
   if (!clipboardPoller_.isAbsent()) {
-    connect(settings->clipboardRefreshTimeoutSecs(), SLOT(settingsChangedSignal(const QVariant&)),
+    connect(settings->clipboardRefreshTimeoutSecs(), SIGNAL(settingsChangedSignal(const QVariant&)),
         SLOT(onClipboardRefreshTimeoutSecsChanged(const QVariant&)));
   }
+
+  // setup action executor
+  connect(settings->launchShortcutKeySequence(), SIGNAL(settingsChangedSignal(const QVariant&)),
+      SLOT(onLaunchShortcutKeySequenceChanged(const QVariant&)));
 
   // make sure we save out our settings
   connect(qApp, SIGNAL(aboutToQuit()), SLOT(saveConfig()));
@@ -56,13 +67,17 @@ void SettingCoordinator::saveConfig() {
     }
     settings_->history()->setValue(list);
   }
-  settings_->sync();
+  settings_->saveConfig();
 }
 
 void SettingCoordinator::loadConfig() {
   qxtLog->debug("loadConfig");
+  settings_->loadConfig();
+}
+
+void SettingCoordinator::onHistoryChanged(const QVariant& value) {
   clipboardManager_->clearItems();
-  QList<QVariant> list = settings_->history()->value().toList();
+  QList<QVariant> list = value.toList();
   foreach (const QVariant& variantItem, list) {
     QByteArray byteArray = variantItem.toByteArray();
     ClipboardItem* item = ClipboardItem::deserialize(byteArray);
@@ -84,4 +99,11 @@ void SettingCoordinator::onNumFreeItemsChanged(const QVariant& value) {
 
 void SettingCoordinator::onClipboardRefreshTimeoutSecsChanged(const QVariant& value) {
   clipboardPoller_.get()->setClipboardRefreshTimeoutMillis(1000 * value.toFloat());
+}
+
+void SettingCoordinator::onLaunchShortcutKeySequenceChanged(const QVariant& value) {
+  QxtGlobalShortcut* shortcut = actionExecutor_->launchMenuShortcut();
+  shortcut->setEnabled(); // TODO
+  QKeySequence ks = value.value<QKeySequence>();
+  shortcut->setShortcut(ks);
 }
