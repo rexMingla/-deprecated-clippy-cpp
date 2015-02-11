@@ -83,17 +83,17 @@ void QxtBasicFileLoggerEngine::writeToFile(const QString &level, const QVariantL
 {
     if (messages.isEmpty()) return;
     QString header = '[' + QDateTime::currentDateTime().toString(qxt_d().dateFormat) + "] [" + level + "] ";
-    QString padding;
+    //QString padding;
     QIODevice* file = device();
     Q_ASSERT(file);
     file->write(header.toUtf8());
-    for (int i = 0; i < header.size(); i++) padding.append(" ");
+    //for (int i = 0; i < header.size(); i++) padding.append(" ");
     int count = 0;
     Q_FOREACH(const QVariant& out, messages)
     {
         if (!out.isNull())
         {
-            if (count != 0) file->write(padding.toUtf8());
+            //if (count != 0) file->write(padding.toUtf8());
             file->write(out.toString().toUtf8());
             file->write("\n");
         }

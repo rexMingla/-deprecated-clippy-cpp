@@ -185,18 +185,19 @@ void QxtBasicSTDLoggerEngine::writeToStdErr(const QString &level, const QList<QV
 {
     if (msgs.isEmpty()) return;
     QString header = '[' + QTime::currentTime().toString("hh:mm:ss.zzz") + "] [" + level + "] ";
-    QString padding;
+    //QString padding;
     QTextStream* errstream = stdErrStream();
     Q_ASSERT(errstream);
     *errstream << header;
-    for (int i = 0; i < header.size(); i++) padding.append(" ");
+    //for (int i = 0; i < header.size(); i++) padding.append(" ");
     int count = 0;
     Q_FOREACH(const QVariant& out, msgs)
     {
         if (!out.isNull())
         {
-            if (count != 0) *errstream << padding;
-            *errstream << out.toString() << '\n';
+            //if (count != 0) *errstream << padding;
+            //*errstream << out.toString() << '\n';
+            *errstream << out.toString();
         }
         count++;
     }
@@ -217,18 +218,19 @@ void QxtBasicSTDLoggerEngine::writeToStdOut(const QString& level, const QList<QV
     */
     if (msgs.isEmpty()) return;
     QString header = '[' + QTime::currentTime().toString("hh:mm:ss.zzz") + "] [" + level + "] ";
-    QString padding;
+    //QString padding;
     QTextStream* outstream = stdOutStream();
     Q_ASSERT(outstream);
     *outstream << header;
-    for (int i = 0; i < header.size(); i++) padding.append(' ');
+    //for (int i = 0; i < header.size(); i++) padding.append(' ');
     int count = 0;
     Q_FOREACH(const QVariant& out, msgs)
     {
         if (!out.isNull())
         {
-            if (count != 0) *outstream << padding;
-            *outstream << out.toString() << '\n';
+            //if (count != 0) *outstream << padding;
+            //*outstream << out.toString() << '\n';
+            *outstream << out.toString();
         }
         count++;
     }

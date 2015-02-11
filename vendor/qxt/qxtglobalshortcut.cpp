@@ -59,7 +59,10 @@ bool QxtGlobalShortcutPrivate::setShortcut(const QKeySequence& shortcut)
     const quint32 nativeMods = nativeModifiers(mods);
     const bool res = registerShortcut(nativeKey, nativeMods);
     if (res)
+    {
+        qDebug() << "QxtGlobalShortcut registered:" << QKeySequence(key + mods).toString();
         shortcuts.insert(qMakePair(nativeKey, nativeMods), &qxt_p());
+    }
     else
         qWarning() << "QxtGlobalShortcut failed to register:" << QKeySequence(key + mods).toString();
     return res;
@@ -67,17 +70,24 @@ bool QxtGlobalShortcutPrivate::setShortcut(const QKeySequence& shortcut)
 
 bool QxtGlobalShortcutPrivate::unsetShortcut()
 {
+    if (key == 0) {
+      qDebug() << "QxtGlobalShortcut shortcut was not previously registered. doing nothing.";
+      return true;
+    }
     bool res = false;
     const quint32 nativeKey = nativeKeycode(key);
     const quint32 nativeMods = nativeModifiers(mods);
     if (shortcuts.value(qMakePair(nativeKey, nativeMods)) == &qxt_p())
         res = unregisterShortcut(nativeKey, nativeMods);
     if (res)
+    {
+        qDebug() << "QxtGlobalShortcut unregistered:" << QKeySequence(key + mods).toString();
         shortcuts.remove(qMakePair(nativeKey, nativeMods));
+    }
     else
         qWarning() << "QxtGlobalShortcut failed to unregister:" << QKeySequence(key + mods).toString();
-    key = Qt::Key(0);
-    mods = Qt::KeyboardModifiers(0);
+    //key = Qt::Key(0);
+    //mods = Qt::KeyboardModifiers(0);
     return res;
 }
 
@@ -140,7 +150,7 @@ QxtGlobalShortcut::QxtGlobalShortcut(const QKeySequence& shortcut, QObject* pare
  */
 QxtGlobalShortcut::~QxtGlobalShortcut()
 {
-    if (qxt_d().key != 0)
+    if (qxt_d().enabled)
         qxt_d().unsetShortcut();
 }
 
@@ -165,7 +175,7 @@ QKeySequence QxtGlobalShortcut::shortcut() const
 
 bool QxtGlobalShortcut::setShortcut(const QKeySequence& shortcut)
 {
-    if (qxt_d().key != 0)
+    if (isEnabled())
         qxt_d().unsetShortcut();
     return qxt_d().setShortcut(shortcut);
 }
@@ -187,7 +197,13 @@ bool QxtGlobalShortcut::isEnabled() const
 
 void QxtGlobalShortcut::setEnabled(bool enabled)
 {
+    if (qxt_d().enabled == enabled)
+      return ;
     qxt_d().enabled = enabled;
+    if (enabled)
+      qxt_d().setShortcut(QKeySequence(qxt_d().key + qxt_d().mods));
+    else
+      qxt_d().unsetShortcut();
 }
 
 /*!
@@ -197,5 +213,5 @@ void QxtGlobalShortcut::setEnabled(bool enabled)
  */
 void QxtGlobalShortcut::setDisabled(bool disabled)
 {
-    qxt_d().enabled = !disabled;
+    setEnabled(!disabled);
 }

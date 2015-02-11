@@ -1,29 +1,29 @@
 SOURCES += \
-    vendor/qxt/qxtabstractfileloggerengine.cpp \
-    vendor/qxt/qxtabstractiologgerengine.cpp \
-    vendor/qxt/qxtbasicfileloggerengine.cpp \
-    vendor/qxt/qxtbasicstdloggerengine.cpp \
-    vendor/qxt/qxtglobalshortcut.cpp \
-    vendor/qxt/qxtlogger.cpp \
-    vendor/qxt/qxtloggerengine.cpp \
-    vendor/qxt/qxtlogstream.cpp
+    $$PWD/qxtabstractfileloggerengine.cpp \
+    $$PWD/qxtabstractiologgerengine.cpp \
+    $$PWD/qxtbasicfileloggerengine.cpp \
+    $$PWD/qxtbasicstdloggerengine.cpp \
+    $$PWD/qxtglobalshortcut.cpp \
+    $$PWD/qxtlogger.cpp \
+    $$PWD/qxtloggerengine.cpp \
+    $$PWD/qxtlogstream.cpp
 
 HEADERS += \
-    vendor/qxt/qxtabstractfileloggerengine.h \
-    vendor/qxt/qxtbasicstdloggerengine.h \
-    vendor/qxt/qxtbasicfileloggerengine.h \
-    vendor/qxt/qxtglobal.h \
-    vendor/qxt/qxtglobalshortcut_p.h \
-    vendor/qxt/qxtglobalshortcut.h \
-    vendor/qxt/qxtlogger_p.h \
-    vendor/qxt/qxtlogger.h \
-    vendor/qxt/qxtloggerengine.h \
-    vendor/qxt/qxtlogstream_p.h \
-    vendor/qxt/qxtlogstream.h
+    $$PWD/qxtabstractfileloggerengine.h \
+    $$PWD/qxtbasicstdloggerengine.h \
+    $$PWD/qxtbasicfileloggerengine.h \
+    $$PWD/qxtglobal.h \
+    $$PWD/qxtglobalshortcut_p.h \
+    $$PWD/qxtglobalshortcut.h \
+    $$PWD/qxtlogger_p.h \
+    $$PWD/qxtlogger.h \
+    $$PWD/qxtloggerengine.h \
+    $$PWD/qxtlogstream_p.h \
+    $$PWD/qxtlogstream.h
 
 macx {
-    SOURCES += vendor/qxt/qxtglobalshortcut_mac.cpp
+    SOURCES += $$PWD/qxtglobalshortcut_mac.cpp
 }
 win {
-    SOURCES += vendor/qxt/qxtglobalshortcut_win.cpp
+    SOURCES += $$PWD/qxtglobalshortcut_win.cpp
 }
