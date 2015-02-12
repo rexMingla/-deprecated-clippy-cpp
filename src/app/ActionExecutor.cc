@@ -33,8 +33,7 @@ void ActionExecutor::onLaunchMenuTriggered() {
   Process process = osManager_->focusedWindow();
   QAction* selectedAction = actionWidget_->getMenu()->exec(pos);
   process.setAsFocusedWindow();
-  if (selectedAction) {
-    //process.sendKeys(QKeySequence("Ctrl+V"));
+  if (selectedAction && actionWidget_->hasClipboardAction(selectedAction)) {
     process.sendKeys(QKeySequence::Paste);
   }
 }

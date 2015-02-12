@@ -7,7 +7,7 @@
 class Process;
 
 /**
- * @brief Class that gets the focused window.
+ * @brief Class that gets the focused window. Required so that focus can be restores after this app is done.
  */
 class OsManager : public QObject
 {

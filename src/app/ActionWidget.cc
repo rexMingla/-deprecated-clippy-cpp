@@ -46,6 +46,12 @@ void ActionWidget::setNumFreeItems(int numFreeItems) {
   numFreeItems_ = numFreeItems;
 }
 
+bool ActionWidget::hasClipboardAction(QAction* action) {
+  QVariant data = action->data();
+  // if the item doesn't have mime data it's not an action this function cares about. ie. quit or show widget actions
+  return data.canConvert<ClipboardItemPtr>();
+}
+
 QAction* ActionWidget::clipboardItemToAction(int index, const ClipboardItemPtr item, QMenu* parent) {
   QString content = item->displayText();
   QString formattedName = QString("%1. %2").arg(index).arg(content);
@@ -97,11 +103,8 @@ void ActionWidget::rebuildMenu() {
 }
 
 void ActionWidget::onActionTriggered(QAction* action) {
-  QVariant data = action->data();
-  // if the item doesn't have mime data it's not an action this function cares about. ie. quit or show widget actions
-  if (!data.canConvert<ClipboardItemPtr>()) {
-    return;
+  if (hasClipboardAction(action)) {
+    ClipboardItemPtr item = action->data().value<ClipboardItemPtr>();
+    clipboardManager_->setMimeData(item.data());
   }
-  ClipboardItemPtr item = data.value<ClipboardItemPtr>();
-  clipboardManager_->setMimeData(item.data());
 }
