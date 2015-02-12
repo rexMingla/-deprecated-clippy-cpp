@@ -4,6 +4,12 @@
 
 #include "SettingValidator.h"
 
+/**
+ * @brief Verifies that a setting value is within a defined range.
+ *
+ *        The Optionals are probably overkill (as it settings will probably always have upper and lower bounds).
+ *        No effort has been make to make this generic either. ie. floats would not be supported.
+ */
 class RangeSettingValidator : public SettingValidator
 {
 private:

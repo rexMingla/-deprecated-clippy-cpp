@@ -8,6 +8,9 @@
 
 class QVariant;
 
+/**
+ * @brief Interface for all validators.
+ */
 class SettingValidator
 {
 public:

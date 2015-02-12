@@ -12,8 +12,11 @@ class QTimer;
 
 /**
  * @brief Class required because macx os does not provide global clipboard
- * update functionality. Details here:
- * http://stackoverflow.com/questions/5033266/can-i-receive-a-callback-whenever-an-nspasteboard-is-written-to
+ *        update functionality.
+ *
+ *        If the clipboard is updated outside of this application
+ *        http://qt-project.org/doc/qt-4.8/qclipboard.html#changed is not activated. Details here:
+ *        http://stackoverflow.com/questions/5033266/can-i-receive-a-callback-whenever-an-nspasteboard-is-written-to
  */
 class ClipboardPoller : public QObject
 {

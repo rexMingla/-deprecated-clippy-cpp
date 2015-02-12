@@ -15,6 +15,12 @@ class QMimeData;
 class QPixmap;
 class QString;
 
+/**
+ * @brief This class leverages QClipboard to stores history of system clipboard contents.
+ *
+ *        This implementation is only concerned with clipboard mode (see http://qt-project.org/doc/qt-4.8/qclipboard.html#Mode-enum
+ *        for the other unsupported modes).
+ */
 class ClipboardManager : public QObject
 {
   Q_OBJECT

@@ -4,6 +4,9 @@
 
 #include "SettingValidator.h"
 
+/**
+ * @brief Validator that always returns true (added for consistency rather than having a null Validator)
+ */
 class NoopSettingValidator : public SettingValidator
 {
 public:

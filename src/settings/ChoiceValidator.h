@@ -4,6 +4,9 @@
 
 #include "SettingValidator.h"
 
+/**
+ * @brief Validates that a settings value comes from one of a predfined set of values.
+ */
 class ChoiceSettingValidator : public SettingValidator
 {
 private:

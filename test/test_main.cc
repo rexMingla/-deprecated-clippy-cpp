@@ -6,7 +6,13 @@
 
 #include <QDebug>
 
-// Or supply your own main function
+/*
+ * Entry point for Qt unit tests. This 'work around' is required because Qt by default has one executable per test.
+ * We want to run multiple.
+ *
+ * Thanks to this website for the sample framework:
+ * http://qtcreator.blogspot.ca/2010/04/sample-multiple-unit-test-project.html
+ */
 int main(int argc, char *argv[]) {
   QxtBasicSTDLoggerEngine* debugLog = new QxtBasicSTDLoggerEngine();
   qxtLog->addLoggerEngine("debug", debugLog);

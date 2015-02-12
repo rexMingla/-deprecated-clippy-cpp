@@ -12,6 +12,11 @@ class ClipboardManager;
 class ClipboardPoller;
 class Settings;
 
+/**
+ * @brief Class that connects the setting values to the intended receivers.
+ *
+ *        Recieving classes are notified when settings are changed via this class.
+ */
 class SettingCoordinator : public QObject
 {
   Q_OBJECT

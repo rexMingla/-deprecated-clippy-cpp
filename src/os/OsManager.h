@@ -6,6 +6,9 @@
 
 class Process;
 
+/**
+ * @brief Class that gets the focused window.
+ */
 class OsManager : public QObject
 {
     Q_OBJECT

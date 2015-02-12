@@ -15,11 +15,17 @@
 
 class QMimeData;
 
+/**
+ * @brief This is a poor mans wrapper around QMimeData.
+ *
+ *        The data_ map is used interally rather than a QMimeData object as there were issues with QMimeData
+ *        internals going out of scope and causing null pointers when used at a later time.
+ */
 class ClipboardItem : public QObject
 {
   Q_OBJECT
 private:
-  QMap<QString, QByteArray> data_;
+  QMap<QString, QByteArray> data_; // represents QMimeData's internal format object.
 
 public:
   ClipboardItem(const ClipboardItem& other);

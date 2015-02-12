@@ -9,6 +9,9 @@ class SettingItem;
 class QSettings;
 class SettingItem;
 
+/**
+ * @brief Stores collection of settings
+ */
 class Settings : public QObject
 {
   Q_OBJECT

@@ -4,6 +4,11 @@
 
 #include "SettingValidator.h"
 
+/**
+ * @brief Validator of hot key entry
+ *
+ *        TODO: not yet implemented
+ */
 class HotKeySettingValidator : public SettingValidator
 {
 public:

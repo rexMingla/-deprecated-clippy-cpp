@@ -4,6 +4,13 @@
 
 #include <stddef.h>
 
+/**
+ * @brief Class to allow optional objects that are either null or have a value.
+ *
+ *        Stupidly based on Google Guava (https://code.google.com/p/guava-libraries/wiki/UsingAndAvoidingNullExplained)
+ *        rather than std lib or boost (really would make sense to have the interfaces similar). Also, ideally it would
+ *        just use std lib, but this project can't be build with C++11 *sad face*.
+ */
 template <typename T>
 class Optional
 {

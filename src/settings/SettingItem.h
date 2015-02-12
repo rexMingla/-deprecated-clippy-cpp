@@ -9,6 +9,11 @@
 class QSettings;
 class SettingValidator;
 
+/**
+ * @brief Represents Key-value pair that is stored in QSettings class.
+ *
+ *        (This class should really be a lot simpler. Sorry.)
+ */
 class SettingItem : public QObject
 {
   Q_OBJECT

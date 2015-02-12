@@ -11,6 +11,10 @@ class ClipboardManager;
 class QAction;
 class QMenu;
 
+/**
+ * @brief Displays menu of all possible actions. This same widget is used by the SystemTray and also displays
+ * parentless when the launch shortcut is envoked (see ActionExecutor).
+ */
 class ActionWidget : public QWidget
 {
   Q_OBJECT

@@ -8,6 +8,9 @@ class ActionWidget;
 class OsManager;
 class QxtGlobalShortcut;
 
+/**
+ * @brief This class receives global shortcut actions and carries out the required action with use of the OsManager.
+ */
 class ActionExecutor : public QObject
 {
   Q_OBJECT
