@@ -1,3 +1,4 @@
+/* See the file "LICENSE.md" for the full license governing this code. */
 #ifndef SETTINGVALIDATOR_H
 #define SETTINGVALIDATOR_H
 

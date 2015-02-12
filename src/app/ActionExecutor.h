@@ -1,3 +1,4 @@
+/* See the file "LICENSE.md" for the full license governing this code. */
 #ifndef ACTIONEXECUTOR_H
 #define ACTIONEXECUTOR_H
 

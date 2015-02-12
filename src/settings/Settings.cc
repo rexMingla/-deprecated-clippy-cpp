@@ -1,3 +1,4 @@
+/* See the file "LICENSE.md" for the full license governing this code. */
 #include "Settings.h"
 
 #include "src/global/Optional.h"

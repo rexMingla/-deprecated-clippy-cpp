@@ -1,3 +1,4 @@
+/* See the file "LICENSE.md" for the full license governing this code. */
 #ifndef OPTIONAL_H
 #define OPTIONAL_H
 

@@ -1,3 +1,4 @@
+/* See the file "LICENSE.md" for the full license governing this code. */
 #include "Process.h"
 
 #include "Process_p.h"

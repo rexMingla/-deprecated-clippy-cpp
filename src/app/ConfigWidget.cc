@@ -1,3 +1,4 @@
+/* See the file "LICENSE.md" for the full license governing this code. */
 #include "ConfigWidget.h"
 #include "ui_ConfigWidget.h"
 #include "src/settings/Settings.h"
