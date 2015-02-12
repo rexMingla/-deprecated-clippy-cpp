@@ -12,87 +12,60 @@ namespace {
 }
 
 ClipboardItem::ClipboardItem(const ClipboardItem& other)
-  : QObject(),
-    mimeData_(new QMimeData()) {
-  mimeData_->setParent(this);
-  copyMimeData(other.mimeData(), *mimeData_);
+  : QObject() {
+  *this = other;
 }
 
 ClipboardItem::ClipboardItem(const QMimeData* mimeData, QObject* parent)
-  : QObject(parent),
-    mimeData_(new QMimeData()) {
-  mimeData_->setParent(this);
-  copyMimeData(mimeData, *mimeData_);
+  : QObject(parent) {
+  if (!mimeData) {
+    return ;
+  }
+  foreach (const QString& format, mimeData->formats()) {
+    data_[format] = mimeData->data(format);
+  }
 }
 
 ClipboardItem& ClipboardItem::operator=(const ClipboardItem& other) {
-  mimeData_->clear();
-  copyMimeData(other.mimeData(), *mimeData_);
+  data_ = other.data_;
   return *this;
 }
 
 ClipboardItem::~ClipboardItem() {
-  delete mimeData_;
 }
 
 QMimeData* ClipboardItem::mimeData() const {
-  return mimeData_;
+  QMimeData* ret = new QMimeData();
+  foreach (const QString& key, data_.keys()) {
+    ret->setData(key, data_[key]);
+  }
+  return ret;
 }
 
 const QString ClipboardItem::displayText() const {
   QString ret;
-  if (mimeData_->hasImage()) {
+  QMimeData* md = mimeData(); // TODO: fix this. horribly inefficent
+  if (md->hasImage()) {
     return "<image>";
      //setPixmap(qvariant_cast<QPixmap>(mimeData->imageData()));
-   } else if (mimeData_->hasHtml()) {
+   } else if (md->hasHtml()) {
      QTextDocument doc;
-     doc.setHtml(mimeData_->html());
+     doc.setHtml(md->html());
      ret = doc.toPlainText();
-     //setTextFormat(Qt::RichText);
-   } else if (mimeData_->hasText()) {
-     ret = mimeData_->text();
-     //setTextFormat(Qt::PlainText);
+   } else if (md->hasText()) {
+     ret = md->text();
    } else {
-     //setText(tr("Cannot display data"));
+     ret = "Cannot display data";
    }
   return ret;
 }
 
-// see http://stackoverflow.com/questions/13762140/proper-way-to-copy-a-qmimedata-object
-void ClipboardItem::copyMimeData(const QMimeData* from, QMimeData& to) {
-  if (!from) {
-    qxtLog->debug("copyMimeData: null input");
-    return ;
-  }
-  to.clear();
-  foreach (const QString& format, from->formats()) {
-    QByteArray data = from->data(format);
-    qxtLog->debug("copyMimeData: format=", format, " data len=", data.size());
-    to.setData(format, data);
-  }
+bool ClipboardItem::operator==(const ClipboardItem& other) const {
+  return data_ == other.data_;
 }
 
-bool ClipboardItem::isMimeDataEqual(const QMimeData* left, const QMimeData* right) {
-  if (left == NULL && right == NULL) {
-    return true;
-  }
-  if (left == NULL || right == NULL) {
-    return false;
-  }
-  QStringList leftFormats = left->formats();
-  QStringList rightFormats = right->formats();
-  if (leftFormats.size() != rightFormats.size()) {
-    return false;
-  }
-  foreach (const QString& leftFormat, leftFormats) {
-    if (!right->hasFormat(leftFormat)) {
-      return false;
-    }
-    if (left->data(leftFormat) != right->data(leftFormat)) {
-      return false;
-    }
-  }
-  return true;
+bool ClipboardItem::operator!=(const ClipboardItem& item) const {
+  return !(*this == item);
 }
 
 QByteArray ClipboardItem::serialize() const {
@@ -102,11 +75,16 @@ QByteArray ClipboardItem::serialize() const {
   return serializer;
 }
 
-ClipboardItem* ClipboardItem::deserialize(QByteArray& data) {
-  ClipboardItem* item = new ClipboardItem();
-  QDataStream stream(&data, QIODevice::ReadOnly);
-  stream >> *item;
-  return item;
+Optional<ClipboardItem> ClipboardItem::deserialize(QByteArray& data) {
+  try {
+    ClipboardItem item;
+    QDataStream stream(&data, QIODevice::ReadOnly);
+    stream >> item;
+    return Optional<ClipboardItem>::of(item);
+  } catch (std::exception& ex) {
+    qxtLog->debug("unable to deserialize data. ex=", ex.what());
+    return Optional<ClipboardItem>::absent();
+  }
 }
 
 QDataStream& operator<<(QDataStream& istream, const ClipboardItem& item) {

@@ -80,8 +80,10 @@ void SettingCoordinator::onHistoryChanged(const QVariant& value) {
   QList<QVariant> list = value.toList();
   foreach (const QVariant& variantItem, list) {
     QByteArray byteArray = variantItem.toByteArray();
-    ClipboardItem* item = ClipboardItem::deserialize(byteArray);
-    clipboardManager_->addItem(ClipboardItemPtr(item));
+    Optional<ClipboardItem> item = ClipboardItem::deserialize(byteArray);
+    if (item.isPresent()) {
+      clipboardManager_->addItem(ClipboardItemPtr(new ClipboardItem(item.get())));
+    }
   }
 }
 

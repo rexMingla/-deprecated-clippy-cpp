@@ -12,37 +12,53 @@ class ClipboardItemTest : public QObject
 {
   Q_OBJECT
 private:
-  QMimeData* text_;
-  QMimeData* image_;
+  ClipboardItem text_;
+  ClipboardItem image_;
 
 public:
   ClipboardItemTest()
-    : text_(new QMimeData),
-      image_(new QMimeData) {
-    text_->setText("test");
+    : text_(createTextData("test")) {
   }
 
 private Q_SLOTS:
+  void shouldReturnTrueForSameObject() {
+    QVERIFY(text_ == text_);
+  }
+
   void shouldReturnTrueForSameMimeData() {
-    QVERIFY(ClipboardItem::isMimeDataEqual(text_, text_));
+    QVERIFY(text_ == ClipboardItem(createTextData("test")));
   }
 
   void shouldReturnFalseForDifferentMimeData() {
-    QCOMPARE(false, ClipboardItem::isMimeDataEqual(text_, NULL));
+    ClipboardItem other(createTextData("test2"));
+    QCOMPARE(false, text_ == other);
+    QVERIFY(text_ != other);
   }
 
   void shouldBeEqualWhenMimeDataIsCopied() {
-    QMimeData toBeCopied;
-    ClipboardItem::copyMimeData(text_, toBeCopied);
-    QCOMPARE(toBeCopied.text(), QString("test"));
-    QVERIFY(ClipboardItem::isMimeDataEqual(text_, &toBeCopied));
+    ClipboardItem toBeCopied = text_;
+    QVERIFY(toBeCopied == text_);
+    QCOMPARE(false, toBeCopied != text_);
   }
 
   void shouldDeserializeTextDataBackToSameObject() {
     ClipboardItem item(text_);
     QByteArray itemData = item.serialize();
-    ClipboardItem* copy = ClipboardItem::deserialize(itemData);
-    QVERIFY(ClipboardItem::isMimeDataEqual(copy->mimeData(), text_));
+    Optional<ClipboardItem> copy = ClipboardItem::deserialize(itemData);
+    QVERIFY(copy.isPresent());
+    QCOMPARE(copy.get(), text_);
+  }
+
+  void shouldReturnNullOnDeserializationFailure() {
+    QByteArray itemData("random string");
+    Optional<ClipboardItem> copy = ClipboardItem::deserialize(itemData);
+    QVERIFY(copy.isAbsent());
+  }
+
+  QMimeData* createTextData(const QString& value) {
+    QMimeData* ret = new QMimeData();
+    ret->setText(value);
+    return ret;
   }
 };
 

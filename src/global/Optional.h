@@ -25,6 +25,10 @@ public:
     return isAbsent_;
   }
 
+  bool isPresent() const {
+    return !isAbsent_;
+  }
+
   static Optional<T> of(T data) {
     return Optional<T>(data);
   }

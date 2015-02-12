@@ -1,6 +1,8 @@
 #ifndef CLIPBOARDPOLLER_H
 #define CLIPBOARDPOLLER_H
 
+#include "Headers.h"
+
 #include <QObject>
 
 class QClipboard;
@@ -17,7 +19,7 @@ class ClipboardPoller : public QObject
   Q_OBJECT
 private:
   QTimer* timer_;
-  QMimeData* lastClipboardContent_;
+  ClipboardItemPtr lastClipboardContent_;
   QClipboard* clipboard_;
 
 public:

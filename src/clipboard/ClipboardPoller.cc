@@ -15,24 +15,20 @@
 ClipboardPoller::ClipboardPoller(QObject* parent)
   : QObject(parent),
     timer_(new QTimer(this)),
-    lastClipboardContent_(new QMimeData()),
     clipboard_(QApplication::clipboard()) {
   connect(timer_, SIGNAL(timeout()), this, SLOT(onTimeout()));
 
-  lastClipboardContent_->setParent(this);
-  ClipboardItem::copyMimeData(clipboard_->mimeData(), *lastClipboardContent_);
-
+  lastClipboardContent_ = ClipboardItemPtr(new ClipboardItem(clipboard_->mimeData()));
   setClipboardRefreshTimeoutMillis(1000); // 1 sec
 }
 
 ClipboardPoller::~ClipboardPoller() {
-  delete lastClipboardContent_;
 }
 
 void ClipboardPoller::onTimeout() {
-  const QMimeData* newContent = clipboard_->mimeData();
-  if (newContent && !ClipboardItem::isMimeDataEqual(lastClipboardContent_, newContent)) {
-    ClipboardItem::copyMimeData(newContent, *lastClipboardContent_);
+  ClipboardItemPtr newContent(new ClipboardItem(clipboard_->mimeData()));
+  if (*newContent != *lastClipboardContent_) {
+    lastClipboardContent_ = newContent;
     qxtLog->debug("new content");
     emit clipboardChangedSignal();
   }
