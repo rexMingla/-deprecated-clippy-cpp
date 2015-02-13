@@ -8,12 +8,17 @@
 #include "src/clipboard/ClipboardPoller.h"
 #include "src/settings/Settings.h"
 #include "src/settings/SettingItem.h"
+#include "src/global/Logger.h"
 
 #include "vendor/qxt/qxtglobalshortcut.h"
 #include "vendor/qxt/qxtlogger.h"
 
 #include <QApplication>
 #include <QKeySequence>
+
+namespace {
+  Logger log("SettingCoordinator");
+}
 
 SettingCoordinator::SettingCoordinator(ActionWidget* actionWidget,
     ClipboardManager* clipboardManager,
@@ -58,7 +63,7 @@ SettingCoordinator::~SettingCoordinator() {
 }
 
 void SettingCoordinator::saveConfig() {
-  qxtLog->debug("saveConfig");
+  log.debug("saveConfig");
   bool persistData = settings_->persistBetweenSessions()->value().toBool();
   if (persistData) {
     QList<QVariant> list;
@@ -72,7 +77,7 @@ void SettingCoordinator::saveConfig() {
 }
 
 void SettingCoordinator::loadConfig() {
-  qxtLog->debug("loadConfig");
+  log.debug("loadConfig");
   settings_->loadConfig();
 }
 

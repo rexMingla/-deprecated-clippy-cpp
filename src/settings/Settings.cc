@@ -1,21 +1,25 @@
 /* See the file "LICENSE.md" for the full license governing this code. */
 #include "Settings.h"
 
-#include "src/global/Optional.h"
 #include "SettingItem.h"
 #include "ChoiceValidator.h"
 #include "NoopValidator.h"
 #include "RangeSettingValidator.h"
 
-#include "vendor/qxt/qxtlogger.h"
+#include "src/global/Logger.h"
+#include "src/global/Optional.h"
 
 #include <QKeySequence>
 #include <QSettings>
 
+namespace {
+  Logger log("Settings");
+}
+
 Settings::Settings(const QString& filename, QObject* parent)
   : QObject(parent)
 {
-  qxtLog->info("loading settings file=", filename);
+  log.info("loading settings file=", filename);
   settings_ = new QSettings(filename, QSettings::NativeFormat);
   numFreeItems_ = new SettingItem(settings_, "num_free_items", QVariant(0),
       SettingItem::INT, new RangeSettingValidator(Optional<int>::of(0), Optional<int>::of(10)));

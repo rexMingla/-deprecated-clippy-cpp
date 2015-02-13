@@ -196,6 +196,7 @@ void QxtBasicSTDLoggerEngine::writeToStdErr(const QString &level, const QList<QV
         if (!out.isNull())
         {
             //if (count != 0) *errstream << padding;
+            if (count != 0) *errstream << " ";
             //*errstream << out.toString() << '\n';
             *errstream << out.toString();
         }
@@ -230,6 +231,7 @@ void QxtBasicSTDLoggerEngine::writeToStdOut(const QString& level, const QList<QV
         {
             //if (count != 0) *outstream << padding;
             //*outstream << out.toString() << '\n';
+            if (count != 0) *outstream << " ";
             *outstream << out.toString();
         }
         count++;

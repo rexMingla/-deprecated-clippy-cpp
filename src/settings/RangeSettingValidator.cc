@@ -1,9 +1,13 @@
 /* See the file "LICENSE.md" for the full license governing this code. */
 #include "RangeSettingValidator.h"
 
-#include "vendor/qxt/qxtlogger.h"
+#include "src/global/Logger.h"
 
 #include <QVariant>
+
+namespace {
+  Logger log("RangeSettingValidator");
+}
 
 RangeSettingValidator::RangeSettingValidator(Optional<int> min, Optional<int> max)
   : SettingValidator(), min_(min), max_(max) {
@@ -16,7 +20,7 @@ bool RangeSettingValidator::isValid(const QVariant& value) const {
   bool isOk;
   int intValue = value.toInt(&isOk);
   if (!isOk) {
-    qxtLog->warning("int data type expected but not recieved. value=", value);
+    log.warning("int data type expected but not recieved. value=", value);
     return false;
   }
   return (min_.isAbsent() || intValue >= min_.get()) && (max_.isAbsent() || intValue <= max_.get());

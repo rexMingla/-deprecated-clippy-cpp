@@ -94,6 +94,7 @@ void QxtBasicFileLoggerEngine::writeToFile(const QString &level, const QVariantL
         if (!out.isNull())
         {
             //if (count != 0) file->write(padding.toUtf8());
+            if (count != 0) file->write(" ");
             file->write(out.toString().toUtf8());
             file->write("\n");
         }

@@ -4,7 +4,7 @@
 #include "src/clipboard/ClipboardItem.h"
 #include "src/clipboard/ClipboardManager.h"
 #include "src/clipboard/Headers.h"
-#include "vendor/qxt/qxtlogger.h"
+#include "src/global/Logger.h"
 
 #include <QAction>
 #include <QApplication>
@@ -12,6 +12,7 @@
 
 namespace {
   static const int MENU_MAX_WIDTH = 200;
+  Logger log("ActionWidget");
 }
 
 ActionWidget::ActionWidget(ClipboardManager* clipboardManager, QWidget* parent)
@@ -63,7 +64,7 @@ QAction* ActionWidget::clipboardItemToAction(int index, const ClipboardItemPtr i
 }
 
 void ActionWidget::rebuildMenu() {
-  qxtLog->debug("rebuilding menu..");
+  log.debug("rebuilding menu..");
   menu_->clear();
 
   // add clipboard contents (use an action group so that we can bind to the data content that

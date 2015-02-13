@@ -8,6 +8,7 @@
 #include "src/global/Optional.h"
 #include "src/os/OsManager.h"
 #include "src/settings/Settings.h"
+#include "src/global/Logger.h"
 
 #include "vendor/qxt/qxtbasicfileloggerengine.h"
 #include "vendor/qxt/qxtbasicstdloggerengine.h"
@@ -43,7 +44,8 @@ int main(int argc, char *argv[]) {
   }
 
   setupLogs();
-  qxtLog->info("App started");
+  Logger log("main");
+  log.info("App started");
 
   Settings* settings = new Settings(QApplication::applicationDirPath() + "/clippy.ini");
   ConfigWidget* configWidget = new ConfigWidget(settings);
@@ -78,11 +80,11 @@ int main(int argc, char *argv[]) {
 
   try {
     int ret = app->exec();
-    qxtLog->info("App stopped by user");
+    log.info("App stopped by user");
     return ret;
   } catch (const std::exception& ex) {
     // todo: show a pop up
-    qxtLog->warning("An error occured. ex=", ex.what());
+    log.warning("An error occured. ex=", ex.what());
     return 1;
   }
 }

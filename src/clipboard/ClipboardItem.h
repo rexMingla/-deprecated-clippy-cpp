@@ -25,7 +25,7 @@ class ClipboardItem : public QObject
 {
   Q_OBJECT
 private:
-  QMap<QString, QByteArray> data_; // represents QMimeData's internal format object.
+  QMap<QString, QByteArray> formats_; // represents QMimeData's internal format object.
 
 public:
   ClipboardItem(const ClipboardItem& other);

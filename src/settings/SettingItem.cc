@@ -2,9 +2,13 @@
 #include "SettingItem.h"
 #include "SettingValidator.h"
 
-#include "vendor/qxt/qxtlogger.h"
+#include "src/global/Logger.h"
 
 #include <QSettings>
+
+namespace {
+  Logger log("SettingItem");
+}
 
 SettingItem::SettingItem(QSettings* settings, const QString& key, const QVariant& defaultValue,
     SettingItem::SettingType type, const SettingValidator* validator)
@@ -30,17 +34,17 @@ SettingItem::SettingType SettingItem::type() const {
 
 QVariant SettingItem::value() const {
   QVariant val = settings_->value(key_);
-  qxtLog->debug("value. key=", key_, " value=", val);
+  log.debug("value. key=", key_, " value=", val);
   return val;
 }
 
 void SettingItem::setValue(const QVariant& value) {
   if (validator_->isValid(value)) {
-    //qxtLog->debug("set value. key=", key_, " value=", value);
+    log.debug("set value. key=", key_, " value=", value);
     settings_->setValue(key_, value);
     emit settingsChangedSignal(value);
   } else {
-    qxtLog->warning("Setting value ignored as it's invalid. key=", key_, " ignored value=", value);
+    log.warning("Setting value ignored as it's invalid. key=", key_, " ignored value=", value);
   }
 }
 

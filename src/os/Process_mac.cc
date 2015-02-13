@@ -1,14 +1,15 @@
 /* See the file "LICENSE.md" for the full license governing this code. */
 #include "Process_p.h"
 
-//#include "OsxKeyMapper.h"
-#include "vendor/qxt/qxtlogger.h"
+#include "src/global/Logger.h"
 #include "vendor/qxt/qxtglobalshortcut_p.h"
 
 #include <ApplicationServices/ApplicationServices.h>
 #include <QKeySequence>
 
 namespace {
+  Logger logger("Process_mac");
+
   static const int BUFFER_SIZE = 256;
 
   static Qt::KeyboardModifiers ALL_MODS = Qt::ShiftModifier | Qt::ControlModifier | Qt::AltModifier | Qt::MetaModifier;
@@ -47,7 +48,7 @@ ProcessPrivate::ProcessPrivate()
   : psn_(new ProcessSerialNumber()) {
 
   OSStatus err = GetFrontProcess(psn_);
-  qxtLog->debug("GetFrontProcess processSerialNumber={",
+  logger.debug("GetFrontProcess processSerialNumber={",
       (qulonglong) psn_->lowLongOfPSN, ",", (qulonglong) psn_->highLongOfPSN, "} response=", (int) err);
   if (err != noErr) {
     return ;
@@ -57,7 +58,7 @@ ProcessPrivate::ProcessPrivate()
   err = CopyProcessName(psn_, &processName);
   processName_ = CFStringRefToQString(processName, BUFFER_SIZE);
   CFRelease(processName);
-  qxtLog->debug("GetFrontProcess processName=", processName_);
+  logger.debug("GetFrontProcess processName=", processName_);
 }
 
 ProcessPrivate::~ProcessPrivate() {
@@ -66,22 +67,22 @@ ProcessPrivate::~ProcessPrivate() {
 
 void ProcessPrivate::setAsFocusedWindow() {
   if (!isValid()) {
-    qxtLog->info("setAsFocusedWindow: no current process. ignoring command");
+    logger.info("setAsFocusedWindow: no current process. ignoring command");
     return ;
   }
 
   OSStatus err = SetFrontProcess(psn_);
-  qxtLog->debug("SetFrontProcess processName=", processName_, " response=", (int) err);
+  logger.debug("SetFrontProcess processName=", processName_, " response=", (int) err);
 }
 
 void ProcessPrivate::sendKeys(const QKeySequence& keySequence) {
   if (!isValid()) {
-    qxtLog->info("sendKeys: no current process. ignoring command");
+    logger.info("sendKeys: no current process. ignoring command");
     return ;
   }
-  qxtLog->debug("sendKeys keys=", keySequence);
+  logger.debug("sendKeys keys=", keySequence);
   if (keySequence.isEmpty()) {
-    qxtLog->warning("ignoring keySequence as it is empty");
+    logger.warning("ignoring keySequence as it is empty");
     return ;
   }
 
@@ -95,10 +96,10 @@ void ProcessPrivate::sendKeys(const QKeySequence& keySequence) {
   CGEventRef keyUp = CGEventCreateKeyboardEvent(NULL, keyCode, false);
   CGEventSetFlags(keyUp, modifiers);
 
-  qxtLog->debug("sending keys=", keyCode, " modifiers=", modifiers);
+  logger.debug("sending keys=", keyCode, " modifiers=", modifiers);
   CGEventPostToPSN(psn_, keyDown);
   CGEventPostToPSN(psn_, keyUp);
-  qxtLog->debug("keys sent=", keyCode);
+  logger.debug("keys sent=", keyCode);
 
   CFRelease(keyDown);
   CFRelease(keyUp);

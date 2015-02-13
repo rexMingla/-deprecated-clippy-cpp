@@ -5,13 +5,17 @@
 #include "src/settings/SettingItem.h"
 #include "src/settings/Settings.h"
 
-#include "vendor/qxt/qxtlogger.h"
+#include "src/global/Logger.h"
 
 #include <QApplication>
 #include <QClipboard>
 #include <QMimeData>
 #include <QTimer>
 #include <QVariant>
+
+namespace {
+  Logger log("ClipboardPoller");
+}
 
 ClipboardPoller::ClipboardPoller(QObject* parent)
   : QObject(parent),
@@ -30,7 +34,7 @@ void ClipboardPoller::onTimeout() {
   ClipboardItemPtr newContent(new ClipboardItem(clipboard_->mimeData()));
   if (*newContent != *lastClipboardContent_) {
     lastClipboardContent_ = newContent;
-    qxtLog->debug("new content");
+    log.debug("new content");
     emit clipboardChangedSignal();
   }
 }

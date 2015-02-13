@@ -1,15 +1,18 @@
 /* See the file "LICENSE.md" for the full license governing this code. */
 #include "ClipboardItem.h"
 
-#include "vendor/qxt/qxtlogger.h"
+#include "src/global/Logger.h"
 
 #include <QMimeData>
+#include <QStringList>
 #include <QTextDocument>
 
 namespace {
   // breaks the pre-processor, see:
   // http://stackoverflow.com/questions/14216510/qt-foreach-with-templates-with-multiple-parameters
   typedef QPair<QString, QByteArray> SerializedType;
+
+  Logger log("ClipboardItem");
 }
 
 ClipboardItem::ClipboardItem(const ClipboardItem& other)
@@ -23,12 +26,12 @@ ClipboardItem::ClipboardItem(const QMimeData* mimeData, QObject* parent)
     return ;
   }
   foreach (const QString& format, mimeData->formats()) {
-    data_[format] = mimeData->data(format);
+    formats_[format] = mimeData->data(format);
   }
 }
 
 ClipboardItem& ClipboardItem::operator=(const ClipboardItem& other) {
-  data_ = other.data_;
+  formats_ = other.formats_;
   return *this;
 }
 
@@ -37,8 +40,8 @@ ClipboardItem::~ClipboardItem() {
 
 QMimeData* ClipboardItem::mimeData() const {
   QMimeData* ret = new QMimeData();
-  foreach (const QString& key, data_.keys()) {
-    ret->setData(key, data_[key]);
+  foreach (const QString& key, formats_.keys()) {
+    ret->setData(key, formats_[key]);
   }
   return ret;
 }
@@ -62,7 +65,7 @@ const QString ClipboardItem::displayText() const {
 }
 
 bool ClipboardItem::operator==(const ClipboardItem& other) const {
-  return data_ == other.data_;
+  return formats_ == other.formats_;
 }
 
 bool ClipboardItem::operator!=(const ClipboardItem& item) const {
@@ -83,7 +86,7 @@ Optional<ClipboardItem> ClipboardItem::deserialize(QByteArray& data) {
     stream >> item;
     return Optional<ClipboardItem>::of(item);
   } catch (std::exception& ex) {
-    qxtLog->debug("unable to deserialize data. ex=", ex.what());
+    log.warning("unable to deserialize data. ex=", ex.what());
     return Optional<ClipboardItem>::absent();
   }
 }

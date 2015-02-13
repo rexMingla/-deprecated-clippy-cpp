@@ -3,7 +3,7 @@
 
 #include "ClipboardItem.h"
 
-#include "vendor/qxt/qxtlogger.h"
+#include "src/global/Logger.h"
 
 #include <QApplication>
 #include <QClipboard>
@@ -13,6 +13,10 @@
 #include <QPixmap>
 #include <QString>
 #include <QTimer>
+
+namespace {
+  Logger log("ClipboardManager");
+}
 
 ClipboardManager::ClipboardManager(QObject* parent)
   : QObject(parent),
@@ -46,13 +50,13 @@ void ClipboardManager::clearItems() {
 }
 
 void ClipboardManager::setMimeData(ClipboardItem* data) {
-  qxtLog->debug("setMimeData");
+  log.debug("setMimeData");
   ignoreNextValue_ = true;
   clipboard_->setMimeData(data->mimeData());
 }
 
 void ClipboardManager::setText(const QString& text) {
-  qxtLog->debug("setText");
+  log.debug("setText");
   ignoreNextValue_ = true;
   clipboard_->setText(text);
 }
@@ -67,7 +71,7 @@ void ClipboardManager::onClipboardChanged() {
     ignoreNextValue_ = false;
     return;
   }
-  qxtLog->debug("clipboard updated");
+  log.debug("clipboard updated");
   const QMimeData* mimeData = clipboard_->mimeData();
   items_.push_front(ClipboardItemPtr(new ClipboardItem(mimeData, this)));
   cleanupItems();
