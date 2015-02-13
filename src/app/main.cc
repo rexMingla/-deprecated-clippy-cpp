@@ -5,10 +5,10 @@
 #include "SettingCoordinator.h"
 #include "src/clipboard/ClipboardManager.h"
 #include "src/clipboard/ClipboardPoller.h"
-#include "src/global/Optional.h"
+#include "src/common/Optional.h"
 #include "src/os/OsManager.h"
 #include "src/settings/Settings.h"
-#include "src/global/Logger.h"
+#include "src/common/Logger.h"
 
 #include "vendor/qxt/qxtbasicfileloggerengine.h"
 #include "vendor/qxt/qxtbasicstdloggerengine.h"

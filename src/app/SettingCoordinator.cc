@@ -8,7 +8,7 @@
 #include "src/clipboard/ClipboardPoller.h"
 #include "src/settings/Settings.h"
 #include "src/settings/SettingItem.h"
-#include "src/global/Logger.h"
+#include "src/common/Logger.h"
 
 #include "vendor/qxt/qxtglobalshortcut.h"
 #include "vendor/qxt/qxtlogger.h"

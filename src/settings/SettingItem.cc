@@ -2,7 +2,7 @@
 #include "SettingItem.h"
 #include "SettingValidator.h"
 
-#include "src/global/Logger.h"
+#include "src/common/Logger.h"
 
 #include <QSettings>
 

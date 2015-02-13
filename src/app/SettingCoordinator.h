@@ -2,7 +2,7 @@
 #ifndef SETTINGCOORDINATOR_H
 #define SETTINGCOORDINATOR_H
 
-#include "src/global/Optional.h"
+#include "src/common/Optional.h"
 
 #include <QObject>
 

@@ -4,7 +4,7 @@
 #include "ActionWidget.h"
 #include "src/os/OsManager.h"
 #include "src/os/Process.h"
-#include "src/global/Logger.h"
+#include "src/common/Logger.h"
 
 #include "vendor/qxt/qxtglobalshortcut.h"
 #include "vendor/qxt/qxtlogger.h"

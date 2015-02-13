@@ -6,8 +6,8 @@
 #include "NoopValidator.h"
 #include "RangeSettingValidator.h"
 
-#include "src/global/Logger.h"
-#include "src/global/Optional.h"
+#include "src/common/Logger.h"
+#include "src/common/Optional.h"
 
 #include <QKeySequence>
 #include <QSettings>

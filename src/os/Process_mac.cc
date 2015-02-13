@@ -1,7 +1,7 @@
 /* See the file "LICENSE.md" for the full license governing this code. */
 #include "Process_p.h"
 
-#include "src/global/Logger.h"
+#include "src/common/Logger.h"
 #include "vendor/qxt/qxtglobalshortcut_p.h"
 
 #include <ApplicationServices/ApplicationServices.h>

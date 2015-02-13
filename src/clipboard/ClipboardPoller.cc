@@ -5,7 +5,7 @@
 #include "src/settings/SettingItem.h"
 #include "src/settings/Settings.h"
 
-#include "src/global/Logger.h"
+#include "src/common/Logger.h"
 
 #include <QApplication>
 #include <QClipboard>

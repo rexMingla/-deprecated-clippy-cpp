@@ -1,7 +1,7 @@
 /* See the file "LICENSE.md" for the full license governing this code. */
 #include "ClipboardItem.h"
 
-#include "src/global/Logger.h"
+#include "src/common/Logger.h"
 
 #include <QMimeData>
 #include <QStringList>

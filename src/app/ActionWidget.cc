@@ -4,7 +4,7 @@
 #include "src/clipboard/ClipboardItem.h"
 #include "src/clipboard/ClipboardManager.h"
 #include "src/clipboard/Headers.h"
-#include "src/global/Logger.h"
+#include "src/common/Logger.h"
 
 #include <QAction>
 #include <QApplication>

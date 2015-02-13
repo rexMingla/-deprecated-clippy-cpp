@@ -2,7 +2,7 @@
 #ifndef SETTINGVALIDATOR_H
 #define SETTINGVALIDATOR_H
 
-#include "src/global/Optional.h"
+#include "src/common/Optional.h"
 
 #include <QList>
 
