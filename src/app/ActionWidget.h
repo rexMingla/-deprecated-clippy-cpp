@@ -35,7 +35,8 @@ public:
 
   void setNumItemsPerGroup(int numItemsPerGroup);
   void setNumFreeItems(int numFreeItems);
-  bool hasClipboardAction(QAction* action);
+  bool hasClipboardAction(QAction* action) const;
+  bool hasActions() const;
 
 private:
   QAction* clipboardItemToAction(int index, const ClipboardItemPtr item, QMenu* parent);

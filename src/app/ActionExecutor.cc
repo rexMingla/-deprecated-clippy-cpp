@@ -32,7 +32,11 @@ QxtGlobalShortcut* ActionExecutor::launchMenuShortcut() {
   return launchMenuShortcut_;
 }
 
-void ActionExecutor::onLaunchMenuTriggered() { 
+void ActionExecutor::onLaunchMenuTriggered() {
+  if (!actionWidget_->hasActions()) {
+    LOGGER.info("No actions in menu, performing no action");
+    return;
+  }
   QPoint pos = QCursor::pos();
   LOGGER.info("onLaunchMenuTriggered. cursorPos={", pos.x(), ",", pos.y(), "}");
   Process process = osManager_->focusedWindow();

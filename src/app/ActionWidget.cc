@@ -47,10 +47,14 @@ void ActionWidget::setNumFreeItems(int numFreeItems) {
   numFreeItems_ = numFreeItems;
 }
 
-bool ActionWidget::hasClipboardAction(QAction* action) {
+bool ActionWidget::hasClipboardAction(QAction* action) const {
   QVariant data = action->data();
   // if the item doesn't have mime data it's not an action this function cares about. ie. quit or show widget actions
   return data.canConvert<ClipboardItemPtr>();
+}
+
+bool ActionWidget::hasActions() const {
+  return !clipboardManager_->items().empty();
 }
 
 QAction* ActionWidget::clipboardItemToAction(int index, const ClipboardItemPtr item, QMenu* parent) {
