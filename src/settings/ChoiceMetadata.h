@@ -16,7 +16,7 @@ public:
   explicit ChoiceMetadata(const QVariant& defaultValue, const QList<QVariant>& choices);
   ~ChoiceMetadata();
 
-  bool isValid(const QVariant& value) const;
+  bool isValid(const QVariant& value, QString& error) const;
   const QList<QVariant>& choices() const;
 };
 

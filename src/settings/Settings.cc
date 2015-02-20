@@ -1,8 +1,9 @@
 /* See the file "LICENSE.md" for the full license governing this code. */
 #include "Settings.h"
 
-#include "HotKeyMetadata.h"
+#include "BoolMetadata.h"
 #include "ChoiceMetadata.h"
+#include "HotKeyMetadata.h"
 #include "NoopMetadata.h"
 #include "RangeMetadata.h"
 #include "SettingsConstants.h"
@@ -44,13 +45,13 @@ Settings::Settings(const QString& filename, QObject* parent)
       .withDisplayName("Max number of items to keep in history")
       .build());
 
-  addItem(SettingItemBuilder(new NoopSettingMetadata(true))
+  addItem(SettingItemBuilder(new BoolMetadata(true))
       .withSettings(qsettings_)
       .withKey(SettingsConstants::PERSIST_BETWEEN_SESSIONS)
       .withDisplayName("Preserve history between sessions")
       .build());
 
-  addItem(SettingItemBuilder(new NoopSettingMetadata(QList<QVariant>()))
+  addItem(SettingItemBuilder(new NoopMetadata(QList<QVariant>()))
       .withSettings(qsettings_)
       .withKey(SettingsConstants::HISTORY)
       .withIsHidden(true)

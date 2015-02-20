@@ -19,7 +19,7 @@ public:
   RangeMetadata(const QVariant& defaultValue, const QVariant& min, const QVariant& max);
   ~RangeMetadata();
 
-  bool isValid(const QVariant& value) const;
+  bool isValid(const QVariant& value, QString& error) const;
 
   const QVariant& min() const;
   const QVariant& max() const;

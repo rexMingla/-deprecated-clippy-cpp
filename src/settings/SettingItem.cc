@@ -37,14 +37,21 @@ QVariant SettingItem::value() const {
   return val;
 }
 
-void SettingItem::setValue(const QVariant& value) {
-  if (metadata_->isValid(value)) {
-    log.debug("set value. key=", key_, " value=", value);
+bool SettingItem::setValue(const QVariant& value) {
+  QString error;
+  return setValue(value, error);
+}
+
+bool SettingItem::setValue(const QVariant& value, QString& error) {
+  bool isValid = metadata_->isValid(value);
+  if (isValid) {
+    log.debug("set value. key=", key_, "value=", value, "error=", error);
     settings_->setValue(key_, value);
     emit settingsChangedSignal(value);
   } else {
     log.warning("Setting value ignored as it's invalid. key=", key_, " ignored value=", value);
   }
+  return isValid;
 }
 
 const SettingMetadata& SettingItem::metadata() const {

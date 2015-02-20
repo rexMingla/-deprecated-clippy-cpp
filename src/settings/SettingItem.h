@@ -15,6 +15,8 @@ class SettingMetadata;
 class SettingItem : public QObject
 {
   Q_OBJECT
+  friend class SettingItemBuilder;
+
 private:
   QSettings* settings_;
   const SettingMetadata* metadata_;
@@ -32,7 +34,8 @@ public:
   const QString& displayName() const;
   bool isHidden() const;
   QVariant value() const;
-  void setValue(const QVariant& value);
+  bool setValue(const QVariant& value);
+  bool setValue(const QVariant& value, QString& error);
   const SettingMetadata& metadata() const;
 
 signals:

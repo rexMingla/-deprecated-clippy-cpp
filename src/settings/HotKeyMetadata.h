@@ -17,7 +17,7 @@ public:
   HotKeyMetadata(const QKeySequence& defaultValue);
   ~HotKeyMetadata();
 
-  bool isValid(const QVariant& value) const;
+  bool isValid(const QVariant& value, QString& error) const;
 };
 
 #endif // HOTKEYSETTING_H

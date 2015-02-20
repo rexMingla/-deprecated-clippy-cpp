@@ -1,8 +1,9 @@
 /* See the file "LICENSE.md" for the full license governing this code. */
 #include "SettingMetadata.h"
 
-SettingMetadata::SettingMetadata(const QVariant& defaultValue)
-  : defaultValue_(defaultValue),
+SettingMetadata::SettingMetadata(Type type, const QVariant& defaultValue)
+  : type_(type),
+    defaultValue_(defaultValue),
     isHidden_(false) {
 }
 
@@ -29,6 +30,11 @@ const QVariant& SettingMetadata::defaultValue() const {
   return defaultValue_;
 }
 
-QVariant::Type SettingMetadata::type() const {
-  return defaultValue_.type();
+SettingMetadata::Type SettingMetadata::type() const {
+  return type_;
+}
+
+bool SettingMetadata::isValid(const QVariant& value) const {
+  QString error;
+  return isValid(value, error);
 }

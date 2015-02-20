@@ -4,12 +4,12 @@
 #include <QKeySequence>
 
 HotKeyMetadata::HotKeyMetadata(const QKeySequence& defaultValue)
-  : SettingMetadata(defaultValue) {
+  : SettingMetadata(HOT_KEY, defaultValue) {
 }
 
 HotKeyMetadata::~HotKeyMetadata() {
 }
 
-bool HotKeyMetadata::isValid(const QVariant&) const {
+bool HotKeyMetadata::isValid(const QVariant& value, QString& error) const {
   return false; // TODO
 }

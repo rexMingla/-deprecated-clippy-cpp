@@ -10,7 +10,7 @@ namespace {
 }
 
 RangeMetadata::RangeMetadata(const QVariant& defaultValue, const QVariant& min, const QVariant& max)
-  : SettingMetadata(defaultValue),
+  : SettingMetadata(RANGE, defaultValue),
     min_(min),
     max_(max) {
   assert(min.type() == max.type() &&
@@ -22,14 +22,15 @@ RangeMetadata::RangeMetadata(const QVariant& defaultValue, const QVariant& min, 
 RangeMetadata::~RangeMetadata() {
 }
 
-bool RangeMetadata::isValid(const QVariant& value) const {
+bool RangeMetadata::isValid(const QVariant& value, QString& error) const {
   bool isOk;
   int intValue = value.toInt(&isOk);
   if (!isOk) {
-    log.warning("Only int value is supported at the moment. value=", value);
-    return false;
+    error = QString("Only int value is supported at the moment. value=%1").arg(value.toString());
+  } else if (intValue < min_.toInt() && intValue > max_.toInt()) {
+    error = QString("Value must be between %1 and %2").arg(min_.toInt()).arg(max_.toInt());
   }
-  return intValue >= min_.toInt() && intValue <= max_.toInt();
+  return error.isEmpty();
 }
 
 const QVariant& RangeMetadata::min() const {

@@ -1,14 +1,15 @@
-/* See the file "LICENSE.md" for the full license governing this code. */
 #include "NoopMetadata.h"
 
-NoopSettingMetadata::NoopSettingMetadata(const QVariant& defaultValue)
-  : SettingMetadata(defaultValue) {
+NoopMetadata::NoopMetadata(const QVariant& defaultValue)
+  : SettingMetadata(NO_OP, defaultValue) {
 }
 
-NoopSettingMetadata::~NoopSettingMetadata() {
+NoopMetadata::~NoopMetadata() {
 }
 
-bool NoopSettingMetadata::isValid(const QVariant&) const {
+bool NoopMetadata::isValid(const QVariant& value, QString& error) const {
+  Q_UNUSED(value);
+  Q_UNUSED(error);
   return true;
 }
 

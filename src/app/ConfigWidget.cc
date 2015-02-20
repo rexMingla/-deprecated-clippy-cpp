@@ -1,6 +1,7 @@
 /* See the file "LICENSE.md" for the full license governing this code. */
 #include "ConfigWidget.h"
 
+#include "src/common/Optional.h"
 #include "src/settings/Settings.h"
 #include "src/settings/SettingMetadata.h"
 #include "src/settings/SettingItem.h"
@@ -25,11 +26,12 @@ void ConfigWidget::setupUi() {
   lo->setContentsMargins(4, 4, 4, 4);
   int row = 0;
   foreach (SettingItem* item, settings_->settings()) {
-    const SettingMetadata& metdata = item->metadata();
-    if (metdata.isHidden()) {
-      continue;
+    SettingItemWidget* widget = factory_->createSettingsWidget(item);
+    if (!widget) {
+      continue ;
     }
+    const SettingMetadata& metdata = item->metadata();
     lo->addWidget(new QLabel(metdata.displayName(), this), row, 0);
-    lo->addWidget(factory_->createSettingsWidget(item), row++, 1);
+    lo->addWidget(widget, row++, 1);
   }
 }
