@@ -1,16 +1,35 @@
 /* See the file "LICENSE.md" for the full license governing this code. */
 #include "ConfigWidget.h"
-#include "ui_ConfigWidget.h"
-#include "src/settings/Settings.h"
 
-ConfigWidget::ConfigWidget(Settings* settings, QWidget* parent)
+#include "src/settings/Settings.h"
+#include "src/settings/SettingMetadata.h"
+#include "src/settings/SettingItem.h"
+#include "src/settingsWidget/SettingItemWidget.h"
+#include "src/settingsWidget/SettingItemWidgetFactory.h"
+
+#include <QGridLayout>
+#include <QLabel>
+
+ConfigWidget::ConfigWidget(Settings* settings, SettingItemWidgetFactory* factory, QWidget* parent)
   : QWidget(parent),
     settings_(settings),
-    ui_(new Ui_ConfigWidget) {
-  settings_->setParent(this);
-  ui_->setupUi(this);
+    factory_(factory) {
+  setupUi();
 }
 
 ConfigWidget::~ConfigWidget() {
-  delete ui_;
+}
+
+void ConfigWidget::setupUi() {
+  QGridLayout* lo = new QGridLayout(this);
+  lo->setContentsMargins(4, 4, 4, 4);
+  int row = 0;
+  foreach (SettingItem* item, settings_->settings()) {
+    const SettingMetadata& metdata = item->metadata();
+    if (metdata.isHidden()) {
+      continue;
+    }
+    lo->addWidget(new QLabel(metdata.displayName(), this), row, 0);
+    lo->addWidget(factory_->createSettingsWidget(item), row++, 1);
+  }
 }

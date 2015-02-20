@@ -8,6 +8,7 @@ TEMPLATE = app
 include($$PWD/vendor/qxt/qxt.pri)
 include($$PWD/src/common/common.pri)
 include($$PWD/src/settings/settings.pri)
+include($$PWD/src/settingsWidget/settingsWidget.pri)
 include($$PWD/src/clipboard/clipboard.pri)
 include($$PWD/src/os/os.pri)
 

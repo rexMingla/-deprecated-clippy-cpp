@@ -3,12 +3,14 @@
 #include "ActionExecutor.h"
 #include "ConfigWidget.h"
 #include "SettingCoordinator.h"
+#include "HotKeyEdit.h"
 #include "src/clipboard/ClipboardManager.h"
 #include "src/clipboard/ClipboardPoller.h"
 #include "src/common/Optional.h"
+#include "src/common/Logger.h"
 #include "src/os/OsManager.h"
 #include "src/settings/Settings.h"
-#include "src/common/Logger.h"
+#include "src/settingsWidget/SettingItemWidgetFactory.h"
 
 #include "vendor/qxt/qxtbasicfileloggerengine.h"
 #include "vendor/qxt/qxtbasicstdloggerengine.h"
@@ -48,9 +50,15 @@ int main(int argc, char *argv[]) {
   log.info("App started");
 
   Settings* settings = new Settings(QApplication::applicationDirPath() + "/clippy.ini");
-  ConfigWidget* configWidget = new ConfigWidget(settings);
+  SettingItemWidgetFactory* factory = new SettingItemWidgetFactory();
+  ConfigWidget* configWidget = new ConfigWidget(settings, factory);
   // there is no main window so this is the master parent. it must get deleted
   QWidget* parent = configWidget;
+  HotKeyEdit* hotKeyEdit = new HotKeyEdit();
+  hotKeyEdit->show();
+  HotKeyEdit* hotKeyEdit2 = new HotKeyEdit();
+  hotKeyEdit2->show();
+
 
   ClipboardManager* clipboardManager = new ClipboardManager(parent);
   Optional<ClipboardPoller*> clipboardPoller = Optional<ClipboardPoller*>::absent();
@@ -60,7 +68,6 @@ int main(int argc, char *argv[]) {
   QObject::connect(clipboardPoller.get(), SIGNAL(clipboardChangedSignal()), clipboardManager, SLOT(onClipboardChanged()));
 #endif // Q_WS_MAC
 
-  //ActionExecutor* actionExecutor = new ActionExecutor(parent);
   ActionWidget* actionWidget = new ActionWidget(clipboardManager, parent);
   QSystemTrayIcon* systemTray = new QSystemTrayIcon(parent);
   systemTray->setContextMenu(actionWidget->getMenu());

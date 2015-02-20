@@ -7,42 +7,33 @@
 #include <QVariant>
 
 class QSettings;
-class SettingValidator;
+class SettingMetadata;
 
 /**
  * @brief Represents Key-value pair that is stored in QSettings class.
- *
- *        (This class should really be a lot simpler. Sorry.)
  */
 class SettingItem : public QObject
 {
   Q_OBJECT
-public:
-  enum SettingType {
-    INT,
-    BOOL,
-    STRING,
-    FLOAT,
-    LIST,
-    KEY_SEQUENCE
-  };
-
+private:
   QSettings* settings_;
+  const SettingMetadata* metadata_;
   const QString key_;
-  SettingType type_;
-  const SettingValidator* validator_;
-  QVariant defaultValue_;
+  const QString displayName_;
+  bool isHidden_;
 
 public:
-  SettingItem(QSettings* settings, const QString& key, const QVariant& defaultValue,
-      SettingItem::SettingType type, const SettingValidator* validator);
+  SettingItem(QSettings* settings,
+      const SettingMetadata* metadata,
+      const QString& key);
   virtual ~SettingItem();
 
-  SettingType type() const;
+  const QString& key() const;
+  const QString& displayName() const;
+  bool isHidden() const;
   QVariant value() const;
   void setValue(const QVariant& value);
-  void setToDefaultValue();
-  const SettingValidator& validator() const;
+  const SettingMetadata& metadata() const;
 
 signals:
   void settingsChangedSignal(const QVariant& value);

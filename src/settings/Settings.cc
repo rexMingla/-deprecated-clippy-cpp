@@ -1,16 +1,21 @@
 /* See the file "LICENSE.md" for the full license governing this code. */
 #include "Settings.h"
 
+#include "HotKeyMetadata.h"
+#include "ChoiceMetadata.h"
+#include "NoopMetadata.h"
+#include "RangeMetadata.h"
+#include "SettingsConstants.h"
+#include "SettingItemBuilder.h"
 #include "SettingItem.h"
-#include "ChoiceValidator.h"
-#include "NoopValidator.h"
-#include "RangeSettingValidator.h"
 
 #include "src/common/Logger.h"
 #include "src/common/Optional.h"
 
 #include <QKeySequence>
 #include <QSettings>
+
+#include <stdexcept>
 
 namespace {
   Logger log("Settings");
@@ -20,75 +25,72 @@ Settings::Settings(const QString& filename, QObject* parent)
   : QObject(parent)
 {
   log.info("loading settings file=", filename);
-  settings_ = new QSettings(filename, QSettings::NativeFormat);
-  numFreeItems_ = new SettingItem(settings_, "num_free_items", QVariant(0),
-      SettingItem::INT, new RangeSettingValidator(Optional<int>::of(0), Optional<int>::of(10)));
-  numItemsPerGroup_ = new SettingItem(settings_, "num_items_per_group", QVariant(10),
-      SettingItem::INT, new RangeSettingValidator(Optional<int>::of(5), Optional<int>::of(100)));
-  maxNumItems_ = new SettingItem(settings_, "max_num_items", QVariant(30),
-      SettingItem::INT, new RangeSettingValidator(Optional<int>::of(10), Optional<int>::of(1000)));
-  persistBetweenSessions_ = new SettingItem(settings_, "persist_between_sessions", QVariant(true),
-      SettingItem::BOOL, new NoopSettingValidator());
-  history_ = new SettingItem(settings_, "history", QVariant(QList<QVariant>()),
-      SettingItem::LIST, new NoopSettingValidator());
-  QKeySequence defaultLaunchKey = QKeySequence("Ctrl+Shift+V");
-  launchShortcutKeySequence_ = new SettingItem(settings_, "launch_shortcut_key_sequence",
-      defaultLaunchKey, SettingItem::KEY_SEQUENCE, new NoopSettingValidator());
+  qsettings_ = new QSettings(filename, QSettings::NativeFormat);
+  addItem(SettingItemBuilder(new RangeMetadata(10, 0, 10))
+      .withSettings(qsettings_)
+      .withKey(SettingsConstants::NUM_FREE_ITEMS)
+      .withDisplayName("Number of items in main menu")
+      .build());
 
-  addItem(numFreeItems_);
-  addItem(numItemsPerGroup_);
-  addItem(maxNumItems_);
-  addItem(history_); // TODO: add property to keep this hidden from modification
-  addItem(persistBetweenSessions_);
-  addItem(launchShortcutKeySequence_);
+  addItem(SettingItemBuilder(new RangeMetadata(10, 5, 10))
+      .withSettings(qsettings_)
+      .withKey(SettingsConstants::NUM_ITEMS_PER_GROUP)
+      .withDisplayName("Number of items in each group")
+      .build());
+
+  addItem(SettingItemBuilder(new RangeMetadata(30, 10, 1000))
+      .withSettings(qsettings_)
+      .withKey(SettingsConstants::MAX_NUM_ITEMS)
+      .withDisplayName("Max number of items to keep in history")
+      .build());
+
+  addItem(SettingItemBuilder(new NoopSettingMetadata(true))
+      .withSettings(qsettings_)
+      .withKey(SettingsConstants::PERSIST_BETWEEN_SESSIONS)
+      .withDisplayName("Preserve history between sessions")
+      .build());
+
+  addItem(SettingItemBuilder(new NoopSettingMetadata(QList<QVariant>()))
+      .withSettings(qsettings_)
+      .withKey(SettingsConstants::HISTORY)
+      .withIsHidden(true)
+      .build());
+
+  addItem(SettingItemBuilder(new HotKeyMetadata(QKeySequence("Ctrl+Shift+V")))
+      .withSettings(qsettings_)
+      .withKey(SettingsConstants::LAUNCH_SHORTCUT_KEY)
+      .withDisplayName("Launch menu shortcut key")
+      .build());
 
 #ifdef Q_WS_MAC
   QList<QVariant> timeoutValues;
   timeoutValues << QVariant(0.25) << QVariant(0.5) << QVariant(0.75) << QVariant(1.0);
-  clipboardRefreshTimeoutSecs_ =  new SettingItem(settings_,
-      "clipboard_refresh_timeout_ms", QVariant(0.5),
-      SettingItem::FLOAT, new ChoiceSettingValidator(timeoutValues));
-  addItem(clipboardRefreshTimeoutSecs_);
+  addItem(SettingItemBuilder(new ChoiceMetadata(QVariant(0.5), timeoutValues))
+      .withSettings(qsettings_)
+      .withKey(SettingsConstants::CLIPBOARD_REFRESH_TIMEOUT_SECS)
+      .withDisplayName("Time interval to check clipboard has changed (secs)")
+      .build());
 #endif
 }
 
 Settings::~Settings() {
 }
 
-SettingItem* Settings::numFreeItems() {
-  return numFreeItems_;
-}
-
-SettingItem* Settings::numItemsPerGroup() {
-  return numItemsPerGroup_;
-}
-
-SettingItem* Settings::maxNumItems() {
-  return maxNumItems_;
-}
-
-SettingItem* Settings::clipboardRefreshTimeoutSecs() {
-  return clipboardRefreshTimeoutSecs_;
-}
-
-SettingItem* Settings::persistBetweenSessions() {
-  return persistBetweenSessions_;
-}
-
-SettingItem* Settings::history() {
-  return history_;
-}
-
-SettingItem* Settings::launchShortcutKeySequence() {
-  return launchShortcutKeySequence_;
+SettingItem*Settings::setting(const QString& key) {
+  foreach (SettingItem* item, settings_) {
+    if (item->key() == key) {
+      return item;
+    }
+  }
+  throw std::runtime_error("setting with key not found. key=" + key.toStdString());
 }
 
 QList<SettingItem*>& Settings::settings() {
-  return settingList_;
+  return settings_;
 }
 
 void Settings::addItem(SettingItem* item) {
-  settingList_.append(item);
+  settings_.append(item);
   connect(item, SIGNAL(settingsChangedSignal(const QVariant&)), SIGNAL(settingsChangedSignal()));
 }
 
@@ -99,5 +101,5 @@ void Settings::loadConfig() {
 }
 
 void Settings::saveConfig() {
-  settings_->sync();
+  qsettings_->sync();
 }

@@ -6,8 +6,9 @@
 #include "src/clipboard/ClipboardItem.h"
 #include "src/clipboard/ClipboardManager.h"
 #include "src/clipboard/ClipboardPoller.h"
-#include "src/settings/Settings.h"
 #include "src/settings/SettingItem.h"
+#include "src/settings/Settings.h"
+#include "src/settings/SettingsConstants.h"
 #include "src/common/Logger.h"
 
 #include "vendor/qxt/qxtglobalshortcut.h"
@@ -34,25 +35,26 @@ SettingCoordinator::SettingCoordinator(ActionWidget* actionWidget,
     settings_(settings) {
 
   // setup action widget
-  connect(settings_->numFreeItems(), SIGNAL(settingsChangedSignal(const QVariant&)),
+  connect(settings_->setting(SettingsConstants::NUM_FREE_ITEMS), SIGNAL(settingsChangedSignal(const QVariant&)),
       SLOT(onNumFreeItemsChanged(const QVariant&)));
-  connect(settings_->numItemsPerGroup(), SIGNAL(settingsChangedSignal(const QVariant&)),
+  connect(settings_->setting(SettingsConstants::NUM_ITEMS_PER_GROUP), SIGNAL(settingsChangedSignal(const QVariant&)),
       SLOT(onNumItemsPerGroupChanged(const QVariant&)));
 
   // setup clipboard manager
-  connect(settings_->maxNumItems(), SIGNAL(settingsChangedSignal(const QVariant&)),
+  connect(settings_->setting(SettingsConstants::MAX_NUM_ITEMS), SIGNAL(settingsChangedSignal(const QVariant&)),
       SLOT(onMaxNumItemsChanged(const QVariant&)));
-  connect(settings_->history(), SIGNAL(settingsChangedSignal(const QVariant&)),
+  connect(settings_->setting(SettingsConstants::HISTORY), SIGNAL(settingsChangedSignal(const QVariant&)),
       SLOT(onHistoryChanged(const QVariant&)));
 
   // setup clipboard poller
   if (!clipboardPoller_.isAbsent()) {
-    connect(settings->clipboardRefreshTimeoutSecs(), SIGNAL(settingsChangedSignal(const QVariant&)),
+    connect(settings->setting(SettingsConstants::CLIPBOARD_REFRESH_TIMEOUT_SECS),
+        SIGNAL(settingsChangedSignal(const QVariant&)),
         SLOT(onClipboardRefreshTimeoutSecsChanged(const QVariant&)));
   }
 
   // setup action executor
-  connect(settings->launchShortcutKeySequence(), SIGNAL(settingsChangedSignal(const QVariant&)),
+  connect(settings->setting(SettingsConstants::LAUNCH_SHORTCUT_KEY), SIGNAL(settingsChangedSignal(const QVariant&)),
       SLOT(onLaunchShortcutKeySequenceChanged(const QVariant&)));
 
   // make sure we save out our settings
@@ -64,14 +66,14 @@ SettingCoordinator::~SettingCoordinator() {
 
 void SettingCoordinator::saveConfig() {
   log.debug("saveConfig");
-  bool persistData = settings_->persistBetweenSessions()->value().toBool();
+  bool persistData = settings_->setting(SettingsConstants::PERSIST_BETWEEN_SESSIONS)->value().toBool();
   if (persistData) {
     QList<QVariant> list;
     foreach (const ClipboardItemPtr& item, clipboardManager_->items()) {
       QByteArray array = item->serialize();
       list << array;
     }
-    settings_->history()->setValue(list);
+    settings_->setting(SettingsConstants::HISTORY)->setValue(list);
   }
   settings_->saveConfig();
 }

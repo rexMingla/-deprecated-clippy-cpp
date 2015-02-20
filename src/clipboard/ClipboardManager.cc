@@ -30,7 +30,6 @@ ClipboardManager::~ClipboardManager() {
 }
 
 void ClipboardManager::addItem(ClipboardItemPtr item) {
-  item->setParent(this); // steal ownership
   items_.push_back(item);
 }
 

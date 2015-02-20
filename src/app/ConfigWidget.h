@@ -5,23 +5,24 @@
 #include <QWidget>
 
 class Settings;
-class Ui_ConfigWidget;
+class SettingItemWidgetFactory;
 
 /**
  * @brief Displays application configuration.
- *
- *        TODO: not yet implemented.
  */
 class ConfigWidget : public QWidget
 {
   Q_OBJECT
 private:
   Settings* settings_;
-  Ui_ConfigWidget* ui_;
+  SettingItemWidgetFactory* factory_;
 
 public:
-  explicit ConfigWidget(Settings* settings, QWidget* parent = 0);
+  explicit ConfigWidget(Settings* settings, SettingItemWidgetFactory* factory, QWidget* parent = 0);
   ~ConfigWidget();
+
+private:
+  void setupUi();
 };
 
 #endif // CONFIG_WIDGET_H

@@ -16,28 +16,14 @@ class Settings : public QObject
 {
   Q_OBJECT
 private:
-  QSettings* settings_;
-  SettingItem* numFreeItems_;
-  SettingItem* numItemsPerGroup_;
-  SettingItem* maxNumItems_;
-  SettingItem* clipboardRefreshTimeoutSecs_;
-  SettingItem* persistBetweenSessions_;
-  SettingItem* history_;
-  SettingItem* launchShortcutKeySequence_;
-
-  QList<SettingItem*> settingList_;
+  QSettings* qsettings_;
+  QList<SettingItem*> settings_;
 
 public:
   explicit Settings(const QString& filename, QObject* parent = 0);
   ~Settings();
 
-  SettingItem* numFreeItems();
-  SettingItem* numItemsPerGroup();
-  SettingItem* maxNumItems();
-  SettingItem* clipboardRefreshTimeoutSecs();
-  SettingItem* persistBetweenSessions();
-  SettingItem* history();
-  SettingItem* launchShortcutKeySequence();
+  SettingItem* setting(const QString& key);
   QList<SettingItem*>& settings();
 
 private:

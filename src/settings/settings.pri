@@ -1,17 +1,20 @@
 SOURCES += \
+    $$PWD/RangeMetadata.cc \
     $$PWD/Settings.cc \
-    $$PWD/SettingValidator.cc \
+    $$PWD/SettingMetadata.cc \
     $$PWD/SettingItem.cc \
-    $$PWD/RangeSettingValidator.cc \
-    $$PWD/NoopValidator.cc \
-    $$PWD/ChoiceValidator.cc \
-    $$PWD/HotKeySettingValidator.cc
+    $$PWD/NoopMetadata.cc \
+    $$PWD/ChoiceMetadata.cc \
+    $$PWD/HotKeyMetadata.cc \
+    $$PWD/SettingItemBuilder.cc
 
 HEADERS += \
+    $$PWD/RangeMetadata.h \
     $$PWD/Settings.h \
-    $$PWD/SettingValidator.h \
+    $$PWD/SettingMetadata.h \
     $$PWD/SettingItem.h \
-    $$PWD/RangeSettingValidator.h \
-    $$PWD/NoopValidator.h \
-    $$PWD/ChoiceValidator.h \
-    $$PWD/HotKeySettingValidator.h
+    $$PWD/NoopMetadata.h \
+    $$PWD/ChoiceMetadata.h \
+    $$PWD/HotKeyMetadata.h \
+    $$PWD/SettingItemBuilder.h \
+    $$PWD/SettingsConstants.h

@@ -1,6 +1,6 @@
 /* See the file "LICENSE.md" for the full license governing this code. */
 #include "SettingItem.h"
-#include "SettingValidator.h"
+#include "SettingMetadata.h"
 
 #include "src/common/Logger.h"
 
@@ -10,26 +10,25 @@ namespace {
   Logger log("SettingItem");
 }
 
-SettingItem::SettingItem(QSettings* settings, const QString& key, const QVariant& defaultValue,
-    SettingItem::SettingType type, const SettingValidator* validator)
+SettingItem::SettingItem(QSettings* settings,
+    const SettingMetadata* metadata,
+    const QString& key)
   : QObject(settings),
     settings_(settings),
-    key_(key),
-    type_(type),
-    validator_(validator),
-    defaultValue_(defaultValue) {
+    metadata_(metadata),
+    key_(key) {
   QVariant val = value();
-  if (val.isNull() || !validator_->isValid(val)) {
-    setValue(defaultValue);
+  if (val.isNull() || !metadata_->isValid(val)) {
+    setValue(metadata->defaultValue());
   }
 }
 
 SettingItem::~SettingItem() {
-  delete validator_;
+  delete metadata_;
 }
 
-SettingItem::SettingType SettingItem::type() const {
-  return type_;
+const QString& SettingItem::key() const {
+  return key_;
 }
 
 QVariant SettingItem::value() const {
@@ -39,7 +38,7 @@ QVariant SettingItem::value() const {
 }
 
 void SettingItem::setValue(const QVariant& value) {
-  if (validator_->isValid(value)) {
+  if (metadata_->isValid(value)) {
     log.debug("set value. key=", key_, " value=", value);
     settings_->setValue(key_, value);
     emit settingsChangedSignal(value);
@@ -48,10 +47,6 @@ void SettingItem::setValue(const QVariant& value) {
   }
 }
 
-void SettingItem::setToDefaultValue() {
-  setValue(defaultValue_);
-}
-
-const SettingValidator& SettingItem::validator() const {
-  return *validator_;
+const SettingMetadata& SettingItem::metadata() const {
+  return *metadata_;
 }
