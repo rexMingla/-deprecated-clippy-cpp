@@ -6,6 +6,9 @@
 class SettingItem;
 class QVariant;
 
+/**
+ * @brief Base class to allow widgets to set/get SettingItem
+ */
 class SettingItemWidget : public QWidget
 {
   Q_OBJECT

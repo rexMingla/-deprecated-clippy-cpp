@@ -5,6 +5,9 @@
 
 class QComboBox;
 
+/**
+ * @brief This class uses a combo box to allow widget to set/get SettingItem
+ */
 class ChoiceWidget : public SettingItemWidget
 {
   Q_OBJECT

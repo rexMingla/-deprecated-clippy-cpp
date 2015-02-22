@@ -30,6 +30,8 @@ void ConfigWidget::forceShow() {
 void ConfigWidget::setupUi() {
   QGridLayout* lo = new QGridLayout(this);
   lo->setContentsMargins(4, 4, 4, 4);
+  lo->setSpacing(4);
+
   int row = 0;
   foreach (SettingItem* item, settings_->settings()) {
     SettingItemWidget* widget = factory_->createSettingsWidget(item);

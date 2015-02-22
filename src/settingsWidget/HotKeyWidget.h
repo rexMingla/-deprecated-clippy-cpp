@@ -11,12 +11,18 @@ class QEvent;
 class QLineEdit;
 class QPushButton;
 
+/**
+ * @brief This class uses an edit to allow widget to set/get SettingItem key sequence
+ *
+ *        Implementation could be improved to be more intuitive, but is probably not worth the investment in time
+ *        for how much this will actuall be done.
+ */
 class HotKeyWidget : public SettingItemWidget
 {
   Q_OBJECT
 private:
   QLineEdit* edit_;
-  //QPushButton* clearButton_;
+  QPushButton* clearButton_;
   QKeySequence keySequence_;
 
 public:
@@ -35,6 +41,9 @@ private:
   void onFocusIn();
   void updateEdit();
   void applyKeyPress();
+
+private slots:
+  void onClearPressed();
 };
 
 #endif // HOTKEYEDIT_H

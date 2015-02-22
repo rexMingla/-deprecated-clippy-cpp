@@ -8,7 +8,7 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
-#include <QVBoxLayout>
+#include <QHBoxLayout>
 
 namespace {
   Logger log("HotKeyEdit");
@@ -29,15 +29,15 @@ namespace {
     if (ke->modifiers() & Qt::MetaModifier) {
       modifier += "Meta+";
     }
-    QString key = (QString)QKeySequence(ke->key());
+    QString key = QKeySequence(ke->key()).toString();
     return QKeySequence(modifier + key);
   }
 }
 
 HotKeyWidget::HotKeyWidget(SettingItem* item, QWidget* parent)
   : SettingItemWidget(item, parent),
-    edit_(new QLineEdit(this)) {
-    //clearButton_(new QPushButton(this, "Clear")) {
+    edit_(new QLineEdit(this)),
+    clearButton_(new QPushButton("Clear", this)) { // TODO: get clear icon
   setupUi();
   onSettingChanged(item_->value());
 }
@@ -81,33 +81,34 @@ bool HotKeyWidget::eventFilter(QObject* obj, QEvent* event) {
 }
 
 void HotKeyWidget::setupUi() {
-  QVBoxLayout* layout = new QVBoxLayout(this);
-  layout->setContentsMargins(0, 0, 0, 0);
-  layout->addWidget(edit_);
-  //layout->addWidget(clearButton_);
+  clearButton_->setToolTip("Remove shortcut");
+  connect(clearButton_, SIGNAL(clicked()), SLOT(onClearPressed()));
 
+  QHBoxLayout* layout = new QHBoxLayout(this);
+  layout->setContentsMargins(0, 0, 0, 0);
+  layout->setSpacing(4);
+  layout->addWidget(edit_);
+  layout->addWidget(clearButton_);
+
+  edit_->setMinimumWidth(100);
   edit_->setPlaceholderText("Press keys...");
+  edit_->setAlignment(Qt::AlignCenter);
   edit_->installEventFilter(this);
-  edit_->setReadOnly(true);
 }
 
 void HotKeyWidget::onFocusOut() {
   edit_->setStyleSheet("color: black;");
-  // verify change
   updateEdit();
 }
 
 void HotKeyWidget::onFocusIn() {
-  edit_->setStyleSheet("color: gray; border: 1px solid blue");
+  edit_->setStyleSheet("color: gray;");
   edit_->setText("Press keys...");
 }
 
 void HotKeyWidget::updateEdit() {
-  if (keySequence_.count()) {
-    edit_->setText(keySequence_);
-  } else {
-    edit_->clear();
-  }
+  edit_->setText(keySequence_);
+  clearButton_->setEnabled(!item_->value().toString().isEmpty());
 }
 
 void HotKeyWidget::applyKeyPress() {
@@ -116,8 +117,14 @@ void HotKeyWidget::applyKeyPress() {
   if (!isValid) {
     QMessageBox::critical(this, "Invalid sequence", error);
   } else {
+    setValue(keySequence_);
     edit_->clearFocus();
   }
   log.debug("keySequence=", keySequence_, "isValid=", isValid);
+}
+
+void HotKeyWidget::onClearPressed() {
+  log.debug("clear pressed");
+  setValue(QKeySequence());
 }
 
