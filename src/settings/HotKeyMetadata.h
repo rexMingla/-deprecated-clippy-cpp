@@ -4,17 +4,19 @@
 
 #include "SettingMetadata.h"
 
+class StandardShortcuts;
 class QKeySequence;
 
 /**
- * @brief Metadata of hot key entry
- *
- *        TODO: not yet implemented
+ * @brief Data associated with hot key seqeuence
  */
 class HotKeyMetadata : public SettingMetadata
 {
+private:
+  StandardShortcuts* standardShortcuts_;
+
 public:
-  HotKeyMetadata(const QKeySequence& defaultValue);
+  HotKeyMetadata(const QKeySequence& defaultValue, StandardShortcuts* standardShortcuts = 0);
   ~HotKeyMetadata();
 
   bool isValid(const QVariant& value, QString& error) const;

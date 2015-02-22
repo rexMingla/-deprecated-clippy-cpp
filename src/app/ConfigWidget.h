@@ -21,6 +21,9 @@ public:
   explicit ConfigWidget(Settings* settings, SettingItemWidgetFactory* factory, QWidget* parent = 0);
   ~ConfigWidget();
 
+public slots:
+  void forceShow();
+
 private:
   void setupUi();
 };

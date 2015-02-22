@@ -3,7 +3,6 @@
 #include "ActionExecutor.h"
 #include "ConfigWidget.h"
 #include "SettingCoordinator.h"
-#include "HotKeyEdit.h"
 #include "src/clipboard/ClipboardManager.h"
 #include "src/clipboard/ClipboardPoller.h"
 #include "src/common/Optional.h"
@@ -54,11 +53,6 @@ int main(int argc, char *argv[]) {
   ConfigWidget* configWidget = new ConfigWidget(settings, factory);
   // there is no main window so this is the master parent. it must get deleted
   QWidget* parent = configWidget;
-  HotKeyEdit* hotKeyEdit = new HotKeyEdit();
-  hotKeyEdit->show();
-  HotKeyEdit* hotKeyEdit2 = new HotKeyEdit();
-  hotKeyEdit2->show();
-
 
   ClipboardManager* clipboardManager = new ClipboardManager(parent);
   Optional<ClipboardPoller*> clipboardPoller = Optional<ClipboardPoller*>::absent();
@@ -71,7 +65,7 @@ int main(int argc, char *argv[]) {
   ActionWidget* actionWidget = new ActionWidget(clipboardManager, parent);
   QSystemTrayIcon* systemTray = new QSystemTrayIcon(parent);
   systemTray->setContextMenu(actionWidget->getMenu());
-  QObject::connect(actionWidget, SIGNAL(showSettingsSignal()), configWidget, SLOT(show()));
+  QObject::connect(actionWidget, SIGNAL(showSettingsSignal()), configWidget, SLOT(forceShow()));
 
   OsManager* osManager = new OsManager();
   ActionExecutor* actionExecutor = new ActionExecutor(osManager, actionWidget, parent);
@@ -90,7 +84,7 @@ int main(int argc, char *argv[]) {
     log.info("App stopped by user");
     return ret;
   } catch (const std::exception& ex) {
-    // todo: show a pop up
+    // TODO: show a pop up
     log.warning("An error occured. ex=", ex.what());
     return 1;
   }

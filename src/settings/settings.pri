@@ -7,7 +7,8 @@ SOURCES += \
     $$PWD/SettingItem.cc \
     $$PWD/SettingItemBuilder.cc \
     $$PWD/Settings.cc \
-    $$PWD/SettingMetadata.cc
+    $$PWD/SettingMetadata.cc \
+    $$PWD/StandardShortcuts.cc
 
 HEADERS += \
     $$PWD/BoolMetadata.h \
@@ -19,4 +20,5 @@ HEADERS += \
     $$PWD/SettingItemBuilder.h \
     $$PWD/SettingMetadata.h \
     $$PWD/Settings.h \
-    $$PWD/SettingsConstants.h
+    $$PWD/SettingsConstants.h \
+    $$PWD/StandardShortcuts.h

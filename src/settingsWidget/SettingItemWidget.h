@@ -20,7 +20,7 @@ protected:
   void setValue(const QVariant& value);
 
 protected slots:
-  virtual void onSettingChanged(const QVariant& value);
+  virtual void onSettingChanged(const QVariant& value) = 0;
 };
 
 #endif // SETTING_ITEM_WIDGET_H

@@ -2,6 +2,7 @@
 
 #include "ChoiceWidget.h"
 #include "CheckboxWidget.h"
+#include "HotKeyWidget.h"
 #include "RangeWidget.h"
 
 #include "src/settings/SettingMetadata.h"
@@ -30,6 +31,8 @@ SettingItemWidget* SettingItemWidgetFactory::createSettingsWidget(SettingItem* i
     case SettingMetadata::CHOICE:
       return new ChoiceWidget(item, parent_);
       break;
+    case SettingMetadata::HOT_KEY:
+      return new HotKeyWidget(item, parent_);
     default:
       return 0;
   }

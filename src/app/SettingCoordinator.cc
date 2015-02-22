@@ -113,7 +113,7 @@ void SettingCoordinator::onClipboardRefreshTimeoutSecsChanged(const QVariant& va
 
 void SettingCoordinator::onLaunchShortcutKeySequenceChanged(const QVariant& value) {
   QxtGlobalShortcut* shortcut = actionExecutor_->launchMenuShortcut();
-  shortcut->setEnabled(); // TODO
   QKeySequence ks = value.value<QKeySequence>();
-  shortcut->setShortcut(ks);
+  bool isOk = shortcut->setShortcut(ks);
+  log.info("Shortcut set. key=", ks, " result=", isOk);
 }

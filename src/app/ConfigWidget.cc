@@ -21,6 +21,12 @@ ConfigWidget::ConfigWidget(Settings* settings, SettingItemWidgetFactory* factory
 ConfigWidget::~ConfigWidget() {
 }
 
+void ConfigWidget::forceShow() {
+  show();
+  raise();
+  activateWindow();
+}
+
 void ConfigWidget::setupUi() {
   QGridLayout* lo = new QGridLayout(this);
   lo->setContentsMargins(4, 4, 4, 4);
