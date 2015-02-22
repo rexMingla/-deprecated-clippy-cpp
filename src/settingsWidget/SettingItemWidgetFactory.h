@@ -1,3 +1,4 @@
+/* See the file "LICENSE.md" for the full license governing this code. */
 #ifndef SETTING_ITEM_WIDGET_FACTORY_H
 #define SETTING_ITEM_WIDGET_FACTORY_H
 

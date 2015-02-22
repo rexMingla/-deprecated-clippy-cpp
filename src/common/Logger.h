@@ -1,3 +1,4 @@
+/* See the file "LICENSE.md" for the full license governing this code. */
 #ifndef LOGGER_H
 #define LOGGER_H
 

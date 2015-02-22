@@ -1,3 +1,4 @@
+/* See the file "LICENSE.md" for the full license governing this code. */
 #ifndef PROCESS_P_H
 #define PROCESS_P_H
 /* See the file "LICENSE.md" for the full license governing this code. */
